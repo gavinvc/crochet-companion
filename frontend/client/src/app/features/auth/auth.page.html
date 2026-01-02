@@ -1,0 +1,96 @@
+<section class="auth-grid">
+  <div class="auth-panel">
+    <div class="mode-toggle">
+      <button type="button" [class.active]="mode() === 'login'" (click)="switchMode('login')">Sign in</button>
+      <button type="button" [class.active]="mode() === 'register'" (click)="switchMode('register')">Create account</button>
+    </div>
+
+    <h1 *ngIf="mode() === 'login'">Welcome back.</h1>
+    <h1 *ngIf="mode() === 'register'">Set up your maker space.</h1>
+
+    <p *ngIf="mode() === 'login'" class="lede">
+      Sign in to access your parser history, synced projects, and studio invite links.
+    </p>
+    <p *ngIf="mode() === 'register'" class="lede">
+      Create a handle, set your preferred pace, and unlock community programs curated for crocheters.
+    </p>
+
+    <form *ngIf="mode() === 'login'" class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" formControlName="email" autocomplete="email" placeholder="you@email.com" />
+        <small class="field-error" *ngIf="fieldError(loginForm, 'email') as emailError">{{ emailError }}</small>
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" formControlName="password" autocomplete="current-password" placeholder="••••••••" />
+        <small class="field-error" *ngIf="fieldError(loginForm, 'password') as passwordError">{{ passwordError }}</small>
+      </label>
+
+      <button type="submit" class="primary" [disabled]="isSubmitting()" [attr.aria-busy]="isSubmitting()">
+        {{ isSubmitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <form *ngIf="mode() === 'register'" class="auth-form" [formGroup]="registerForm" (ngSubmit)="submitRegister()" novalidate>
+      <label class="field">
+        <span>Display name</span>
+        <input type="text" formControlName="displayName" autocomplete="name" placeholder="Avery Maker" />
+        <small class="field-error" *ngIf="fieldError(registerForm, 'displayName') as nameError">{{ nameError }}</small>
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" formControlName="email" autocomplete="email" placeholder="studio@email.com" />
+        <small class="field-error" *ngIf="fieldError(registerForm, 'email') as regEmailError">{{ regEmailError }}</small>
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" formControlName="password" autocomplete="new-password" placeholder="At least 8 characters" />
+        <small class="field-error" *ngIf="fieldError(registerForm, 'password') as regPasswordError">{{ regPasswordError }}</small>
+      </label>
+
+      <label class="field">
+        <span>Public handle <small>(optional)</small></span>
+        <input type="text" formControlName="handle" autocomplete="nickname" placeholder="studio-handle" />
+        <small class="field-hint">Letters, numbers, and hyphens only.</small>
+        <small class="field-error" *ngIf="fieldError(registerForm, 'handle') as handleError">{{ handleError }}</small>
+      </label>
+
+      <label class="field">
+        <span>Experience level</span>
+        <select formControlName="experienceLevel">
+          <option *ngFor="let level of experienceLevels" [value]="level">{{ readableLevel(level) }}</option>
+        </select>
+        <small class="field-error" *ngIf="fieldError(registerForm, 'experienceLevel') as levelError">{{ levelError }}</small>
+      </label>
+
+      <button type="submit" class="primary" [disabled]="isSubmitting()" [attr.aria-busy]="isSubmitting()">
+        {{ isSubmitting() ? 'Creating space…' : 'Create account' }}
+      </button>
+    </form>
+
+    <div class="status" *ngIf="auth.lastError() as error">
+      <p>{{ error }}</p>
+    </div>
+
+    <div class="status success" *ngIf="auth.isLoggedIn()">
+      <p>Signed in as {{ auth.currentUser()?.displayName }}.</p>
+      <a routerLink="/maker-space">Go to maker space</a>
+    </div>
+    <p class="fine-print">
+      By continuing you agree to receive occasional studio journals. You can unsubscribe any time.
+    </p>
+  </div>
+
+  <aside class="auth-aside">
+    <p class="eyebrow">Why sign in</p>
+    <article *ngFor="let benefit of benefits">
+      <h3>{{ benefit.title }}</h3>
+      <p>{{ benefit.detail }}</p>
+    </article>
+    <a routerLink="/" class="return-link">Return home</a>
+  </aside>
+</section>

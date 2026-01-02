@@ -1,0 +1,44 @@
+<section class="patterns-hero">
+  <div>
+    <p class="eyebrow">Pattern Library</p>
+    <h1>Curated journeys for every stitch mood.</h1>
+    <p class="lede">
+      Filter by intention, pace, or yarn story and step into guided playlists that pair perfectly with your current
+      maker season.
+    </p>
+    <div class="filters">
+      <button type="button" *ngFor="let filter of quickFilters">{{ filter }}</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat" *ngFor="let stat of heroStats">
+        <p class="value">{{ stat.value }}</p>
+        <p class="label">{{ stat.label }}</p>
+      </div>
+    </div>
+  </div>
+  <article class="hero-card">
+    <p class="card-label">Daily drop</p>
+    <h3>Soft geometry throw</h3>
+    <p>
+      Translating vintage charts into plain language with live stitch math and color planning.
+    </p>
+    <a routerLink="/parser">Send your own pattern →</a>
+  </article>
+</section>
+
+<section class="collections-grid">
+  <article class="collection" *ngFor="let collection of collections">
+    <span class="pill">{{ collection.tag }}</span>
+    <h3>{{ collection.title }}</h3>
+    <p>{{ collection.summary }}</p>
+    <small>{{ collection.meta }}</small>
+  </article>
+</section>
+
+<section class="patterns-cta">
+  <div>
+    <h2>Need something bespoke?</h2>
+    <p>Share a pattern draft, mood board, or scribbled idea and let the parser co-write your next heirloom.</p>
+  </div>
+  <a routerLink="/parser" class="cta-link">Open the live parser</a>
+</section>

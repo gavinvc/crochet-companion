@@ -1,0 +1,54 @@
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="shell-header">
+  <div class="brand">
+    <a routerLink="/" class="brand-link">{{ brandName }}</a>
+    <p class="brand-tagline">Companion tools for every maker</p>
+    <span *ngIf="isDevInstance" class="dev-pill">Dev build</span>
+  </div>
+
+  <button class="menu-trigger" type="button" (click)="toggleMenu()">
+    <span class="sr-only">Toggle navigation</span>
+    <span [class.open]="isMenuOpen()"></span>
+  </button>
+
+  <nav class="primary-nav" [class.open]="isMenuOpen()">
+    <a
+      *ngFor="let item of navItems"
+      routerLink="{{ item.href }}"
+      routerLinkActive="active"
+      (click)="isMenuOpen.set(false)"
+    >
+      {{ item.label }}
+    </a>
+    <a routerLink="/parser" class="parser-pill" (click)="isMenuOpen.set(false)">
+      Quick Parse
+    </a>
+  </nav>
+
+  <div class="auth-cta">
+    <a *ngIf="!isAuthenticated()" routerLink="/auth" class="ghost">Sign in</a>
+    <a *ngIf="!isAuthenticated()" routerLink="/patterns" class="primary">Browse patterns</a>
+
+    <ng-container *ngIf="isAuthenticated()">
+      <a routerLink="/maker-space" class="primary">My maker space</a>
+      <button type="button" class="ghost" (click)="logout()">Log out</button>
+    </ng-container>
+  </div>
+</header>
+
+<main id="main-content" class="shell-main">
+  <router-outlet />
+</main>
+
+<footer class="shell-footer">
+  <div>
+    <p>Built for crocheters • Real-time tracking • AI-assisted parsing</p>
+    <small>© {{ brandName }} · Crafted with intention</small>
+  </div>
+  <div class="footer-links">
+    <a routerLink="/community">Community</a>
+    <a routerLink="/patterns">Pattern library</a>
+    <a routerLink="/parser">Parser</a>
+  </div>
+</footer>

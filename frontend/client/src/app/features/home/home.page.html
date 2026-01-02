@@ -1,0 +1,61 @@
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Modern crochet companion</p>
+    <h1>Plan, parse, and track every stitch in one calm workspace.</h1>
+    <p class="lede">
+      Crochet Companion pairs expressive community spaces with an AI row parser so you can keep focus on
+      the yarn in your hands—not the chaos of multiple tabs.
+    </p>
+    <div class="hero-cta">
+      <a routerLink="/parser" class="primary">Try the live parser</a>
+      <a routerLink="/patterns" class="secondary">Explore community patterns</a>
+    </div>
+    <div class="signal">
+      <span class="dot"></span>
+      <p>Guests can parse instantly · Sign in to save progress</p>
+    </div>
+  </div>
+  <div class="hero-card">
+    <p class="card-label">Live row tracker</p>
+    <div class="card-row">
+      <span>Row 12</span>
+      <p>"Ch 3, dc in next 4 st, *2 dc in next, dc in next 3* repeat 4x"</p>
+    </div>
+    <div class="card-row muted">
+      <span>Row 13</span>
+      <p>"Turn, ch 1, sc across, mark corners"</p>
+    </div>
+    <div class="card-metrics">
+      <div>
+        <p class="stat">312</p>
+        <p class="label">Active makers</p>
+      </div>
+      <div>
+        <p class="stat">842</p>
+        <p class="label">Patterns parsed this week</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pillars">
+  <article *ngFor="let feature of featurePillars" class="pillar-card">
+    <h3>{{ feature.title }}</h3>
+    <p>{{ feature.copy }}</p>
+  </article>
+</section>
+
+<section class="live-row">
+  <header>
+    <p class="eyebrow">Row-by-row companion</p>
+    <h2>Parse any pattern, then walk row-by-row in real time.</h2>
+    <p>
+      Drop a link from your favorite designer or paste raw text. Crochet Companion cleans the pattern,
+      extracts stitch math, and builds a checklist. Use it signed out for quick help or log in to save and
+      sync progress across devices.
+    </p>
+  </header>
+  <ul>
+    <li *ngFor="let highlight of liveRowHighlights">{{ highlight }}</li>
+  </ul>
+</section>

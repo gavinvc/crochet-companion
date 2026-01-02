@@ -1,0 +1,60 @@
+.community-hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  padding: clamp(2rem, 6vw, 5rem);
+  border-radius: 2rem;
+  background: var(--ink-950);
+  color: var(--sand-50);
+  margin-bottom: 3rem;
+}
+
+.community-hero .cta {
+  display: inline-flex;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  background: var(--sand-50);
+  color: var(--ink-900);
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 1.5rem;
+}
+
+.spotlights {
+  display: grid;
+  gap: 1rem;
+}
+
+.spotlights article {
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.spotlights .project {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  color: var(--accent-pink);
+}
+
+.community-streams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.community-streams article {
+  border: 1px solid var(--ink-100);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  background: var(--sand-50);
+}
+
+.cadence {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-500);
+}

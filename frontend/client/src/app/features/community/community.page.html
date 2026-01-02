@@ -1,0 +1,25 @@
+<section class="community-hero">
+  <div>
+    <p class="eyebrow">Community</p>
+    <h1>Gatherings that respect your pace.</h1>
+    <p class="lede">
+      Join critique tables, async studio notes, and focus circles designed for crocheters who blend art with everyday life.
+    </p>
+    <a routerLink="/auth" class="cta">Reserve a seat</a>
+  </div>
+  <div class="spotlights">
+    <article *ngFor="let spotlight of spotlights">
+      <h3>{{ spotlight.name }}</h3>
+      <p class="project">{{ spotlight.project }}</p>
+      <p>{{ spotlight.detail }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="community-streams">
+  <article *ngFor="let stream of streams">
+    <p class="cadence">{{ stream.cadence }}</p>
+    <h3>{{ stream.title }}</h3>
+    <p>{{ stream.summary }}</p>
+  </article>
+</section>

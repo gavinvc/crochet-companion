@@ -1,0 +1,35 @@
+<section class="profile-hero">
+  <div>
+    <p class="eyebrow">Maker space</p>
+    <h1>{{ title }}</h1>
+    <p class="lede">{{ subtitle }}</p>
+    <div class="hero-actions">
+      <a routerLink="/parser" class="primary">Connect parser</a>
+      <a routerLink="/community" class="ghost">Visit community</a>
+    </div>
+  </div>
+  <div class="profile-card" *ngIf="isPersonalSpace">
+    <p>Quick pulse</p>
+    <h3>3 active projects</h3>
+    <p>Last focused session: 38 minutes ago</p>
+  </div>
+  <div class="profile-card" *ngIf="!isPersonalSpace">
+    <p>Follow this maker</p>
+    <p>Stay updated when they share parser outputs or open critiques.</p>
+  </div>
+</section>
+
+<section class="panels">
+  <article *ngFor="let panel of panels">
+    <h3>{{ panel.title }}</h3>
+    <p>{{ panel.description }}</p>
+    <button type="button">{{ panel.cta }}</button>
+  </article>
+</section>
+
+<section class="quick-actions">
+  <article *ngFor="let action of actions">
+    <h4>{{ action.label }}</h4>
+    <p>{{ action.description }}</p>
+  </article>
+</section>

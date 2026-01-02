@@ -1,0 +1,37 @@
+<section class="parser-hero">
+  <div>
+    <p class="eyebrow">Live parser</p>
+    <h1>Plain-language clarity for even the densest patterns.</h1>
+    <p class="lede">
+      Bring your scribbles, screenshots, and vintage charts. We normalize everything so you can focus on stitching.
+    </p>
+    <a routerLink="/auth" class="cta">Sign in to parse</a>
+  </div>
+  <div class="parser-widget">
+    <p class="widget-label">Currently processing</p>
+    <div class="widget-card">
+      <h3>Breezy bobble cardigan</h3>
+      <p>74% normalized · 2 errata suggestions</p>
+      <ul>
+        <li>Row groupings reorganized</li>
+        <li>Chart symbols translated</li>
+        <li>Yarn substitution proposal</li>
+      </ul>
+      <span class="status-pill">Live</span>
+    </div>
+  </div>
+</section>
+
+<section class="parser-steps">
+  <article *ngFor="let step of steps">
+    <h3>{{ step.title }}</h3>
+    <p>{{ step.detail }}</p>
+  </article>
+</section>
+
+<section class="parser-benefits">
+  <article *ngFor="let benefit of benefits">
+    <h4>{{ benefit.label }}</h4>
+    <p>{{ benefit.description }}</p>
+  </article>
+</section>
