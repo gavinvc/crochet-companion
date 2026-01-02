@@ -1,10 +1,17 @@
 {
   "name": "crochet-companion",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Full-stack Crochet Companion app built with MongoDB, Express, Angular, and Node",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon server.js",
+    "dev:client": "npm --prefix frontend/client run start",
+    "build:client": "npm --prefix frontend/client run build",
+    "client:install": "npm --prefix frontend/client install",
+    "test": "echo \"No backend tests configured\" && exit 0",
+    "client:test": "npm --prefix frontend/client run test"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +20,12 @@
   "dependencies": {
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^5.2.1",
     "mongoose": "^9.1.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.3"
   }
 }
