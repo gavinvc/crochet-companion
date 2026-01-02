@@ -1,4 +1,4 @@
-# Crochet Companion (MEAN Stack)
+# Crochet Companion
 
 A single Git repository that hosts the MongoDB + Express backend and Angular client for the Crochet Companion app. The project root (`crochet-companion/`) is the only Git repository; everything underneath (including `frontend/client`) is tracked from here so you never end up with nested repos.
 
@@ -16,7 +16,8 @@ crochet-companion/
 ## Prerequisites
 
 - Node.js 20+ and npm 10+
-- MongoDB running locally or remotely
+- MongoDB running locally or a MongoDB Atlas cluster
+- Docker (optional, for the one-command MongoDB service)
 - (Optional) Python 3.14 virtual env inside `crochet-env/`
 
 ## Installation
@@ -42,7 +43,12 @@ Create a `.env` file (Git-ignored) or export the variables before running the se
 ```
 PORT=3000
 MONGODB_URI=mongodb://127.0.0.1:27017/crochet-companion
+JWT_SECRET=replace-with-a-long-random-string
+JWT_EXPIRES_IN=7d
+CLIENT_ORIGIN=http://localhost:4200
 ```
+
+You can set multiple allowed origins by comma separating them (e.g. `CLIENT_ORIGIN=http://localhost:4200,https://crochet-companion.vercel.app`).
 
 ## NPM scripts (run from the repo root)
 
@@ -55,11 +61,44 @@ MONGODB_URI=mongodb://127.0.0.1:27017/crochet-companion
 | `npm run build:client` | Production build of the Angular app |
 | `npm run client:test` | Execute Angular/Vitest unit tests |
 
-## Running the stack
+## Quick MongoDB setup
 
-1. Ensure MongoDB is running and reachable by `MONGODB_URI`.
-2. In one terminal, run `npm run dev` to boot both the API and Angular client.
-3. Visit `http://localhost:4200` for the Angular app; API health check lives at `http://localhost:3000/api/health`.
+### Option A – Docker (local development)
+
+Use the provided `docker-compose.yml` to run MongoDB 7 locally:
+
+```bash
+docker compose up -d mongodb
+# connection string: mongodb://127.0.0.1:27017/crochet-companion
+```
+
+Data persists in the named `mongo-data` volume. Stop the container with `docker compose down`.
+
+### Option B – MongoDB Atlas (cloud)
+
+1. Create a free Atlas project and a database user.
+2. Allow the Vercel IP ranges or `0.0.0.0/0` while developing.
+3. Copy the SRV connection string, replace `<password>` with your user password, and set it as `MONGODB_URI`.
+4. (Optional) Add `retryWrites=true&w=majority` for better fault tolerance.
+
+## Running the stack locally
+
+1. Start MongoDB (Docker or Atlas connection).
+2. Run `npm run dev` to boot both the API (http://localhost:3000) and Angular client (http://localhost:4200).
+3. Use `npm run dev:server` or `npm run dev:client` for focused development on a single side.
+
+## Deploying on Vercel
+
+The repository is configured so a single Vercel project can host both the Angular static build and the Express API as a serverless function.
+
+1. **Create project:** `vercel init` (or import the GitHub repo) and choose "Other".
+2. **Environment variables:** add `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, and `CLIENT_ORIGIN` (set to your Vercel domain, e.g. `https://crochet-companion.vercel.app`).
+3. **Build command:** default `npm run build` (already mapped to the Angular build).
+4. **Output directory:** `frontend/client/dist/client/browser` (defined in `vercel.json`).
+5. **API routes:** requests to `/api/*` are forwarded to `api/index.js`, which boots the same Express app used locally and reuses the MongoDB connection.
+6. **Local parity:** run `vercel dev` to simulate the Vercel platform, including the serverless API and Angular build output.
+
+> **Note:** Make sure your MongoDB cluster allows connections from Vercel. Atlas makes this easy through the Network Access tab.
 
 ## Working with Git
 
