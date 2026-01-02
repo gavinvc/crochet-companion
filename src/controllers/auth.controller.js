@@ -14,7 +14,7 @@ const registerSchema = z.object({
   bio: z.string().max(280).optional().default(''),
   location: z.string().max(120).optional().default(''),
   experienceLevel: z.enum(EXPERIENCE_LEVELS).optional().default('beginner'),
-  avatarUrl: z.string().url().optional().default('')
+  avatarUrl: z.string().url().or(z.literal('')).optional().default('')
 });
 
 const loginSchema = z.object({
