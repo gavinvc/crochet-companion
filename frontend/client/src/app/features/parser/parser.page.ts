@@ -21,14 +21,14 @@ type ParserBenefit = {
 })
 export class ParserPage {
   protected readonly steps: ParserStep[] = [
-    { title: 'Drop in any pattern format', detail: 'Paste, upload, or link to PDFs and notes. We auto-detect abbreviations and stitch languages.' },
-    { title: 'Let the parser normalize', detail: 'We translate charts to plain language, calculate stitch math, and surface potential errata.' },
-    { title: 'Track rows live', detail: 'Send the cleaned pattern to your maker space with live row tracking and yarn usage projections.' }
+    { title: 'Drop in any pattern format', detail: 'Coming soon: paste, upload, or link to PDFs and notes with auto-detected abbreviations.' },
+    { title: 'Let the parser normalize', detail: 'Coming soon: chart translation, stitch math, and errata surfacing.' },
+    { title: 'Track rows live', detail: 'Coming soon: send cleaned patterns to your maker space with live tracking.' }
   ];
 
   protected readonly benefits: ParserBenefit[] = [
-    { label: 'Chart → text', description: 'Readable, mobile-friendly directions generated instantly.' },
-    { label: 'Fiber-aware', description: 'Hook, yarn, and gauge guidance based on your stash profile.' },
-    { label: 'Collaboration', description: 'Share a parsing room with co-makers and annotate together.' }
+    { label: 'Chart → text', description: 'Coming soon: readable, mobile-friendly directions generated instantly.' },
+    { label: 'Fiber-aware', description: 'Coming soon: hook, yarn, and gauge guidance based on your stash profile.' },
+    { label: 'Collaboration', description: 'Coming soon: share a parsing room with co-makers and annotate together.' }
   ];
 }

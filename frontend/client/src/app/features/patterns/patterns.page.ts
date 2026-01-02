@@ -25,35 +25,35 @@ export class PatternsPage {
   protected readonly collections: PatternCollection[] = [
     {
       title: 'Studio Staples',
-      summary: 'Modern silhouettes with annotated checkpoints, perfect for sweaters and layering pieces.',
+      summary: 'Coming soon: modern silhouettes with annotated checkpoints for sweaters and layers.',
       tag: 'Wearables',
-      meta: '12 curated cardigans • 4 yarn stories'
+      meta: 'Launching soon'
     },
     {
       title: 'Mindful Rows',
-      summary: 'Meditative blankets and motifs paced for nightly wind-down stitching.',
+      summary: 'Coming soon: meditative blankets and motifs paced for nightly wind-down stitching.',
       tag: 'Calm makes',
-      meta: '8 textured blankets • Breathwork cues'
+      meta: 'Launching soon'
     },
     {
       title: 'Playful Keepsakes',
-      summary: 'Amigurumi sets with color-matching tips and stash-friendly substitutions.',
+      summary: 'Coming soon: amigurumi sets with color-matching tips and stash-friendly substitutions.',
       tag: 'Amigurumi',
-      meta: '15 characters • Palette planner'
+      meta: 'Launching soon'
     },
     {
       title: 'Heirloom Moments',
-      summary: 'Bridal, baby, and ceremony-ready lacework with row-by-row translation to plain language.',
+      summary: 'Coming soon: bridal, baby, and ceremony-ready lacework translated to plain language.',
       tag: 'Heritage',
-      meta: '9 heirloom prompts • Blocking guides'
+      meta: 'Launching soon'
     }
   ];
 
-  protected readonly quickFilters = ['Wearables', 'Accessories', 'Keepsakes', 'Baby', 'Mindful rows'];
+  protected readonly quickFilters = ['Wearables (coming soon)', 'Accessories (coming soon)', 'Keepsakes (coming soon)', 'Baby (coming soon)', 'Mindful rows (coming soon)'];
 
   protected readonly heroStats: PatternStat[] = [
-    { label: 'Patterns tracked', value: '2,180+' },
-    { label: 'Makers active', value: '8,400' },
-    { label: 'Avg. focus session', value: '42m' }
+    { label: 'Patterns tracked', value: 'Coming soon' },
+    { label: 'Makers active', value: 'Coming soon' },
+    { label: 'Avg. focus session', value: 'Coming soon' }
   ];
 }

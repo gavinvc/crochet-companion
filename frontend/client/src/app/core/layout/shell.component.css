@@ -30,9 +30,13 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem clamp(1rem, 5vw, 4rem);
-  background: linear-gradient(135deg, var(--ink-900), var(--plum-700));
+  background: linear-gradient(120deg, rgba(32, 23, 16, 0.96), rgba(59, 43, 34, 0.96));
   color: var(--sand-50);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 30px rgba(24, 16, 11, 0.15);
+}
+
 .brand {
   display: flex;
   flex-direction: column;
@@ -48,8 +52,8 @@
 
 .brand-tagline {
   margin: 0.25rem 0 0;
-  font-size: 0.85rem;
-  opacity: 0.7;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .dev-pill {
@@ -75,10 +79,11 @@
 }
 
 .primary-nav a {
-  color: var(--sand-100);
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   position: relative;
   padding-bottom: 0.25rem;
+  transition: color 150ms ease;
 }
 
 .primary-nav a.active::after,
@@ -95,7 +100,8 @@
 .parser-pill {
   padding: 0.35rem 0.85rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--sand-50);
 }
 
 .auth-cta {
@@ -130,24 +136,32 @@
 .shell-footer {
   display: flex;
   justify-content: space-between;
-  padding: 2rem clamp(1rem, 5vw, 4rem);
+  align-items: center;
+  padding: 2.5rem clamp(1rem, 6vw, 5rem) 3rem;
   background: var(--ink-950);
-  color: var(--sand-200);
+  color: var(--sand-100);
   flex-wrap: wrap;
-  gap: 1rem;
-}
+  gap: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  line-height: 1.7;
 }
 
 .shell-footer a {
   color: inherit;
   text-decoration: none;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 
 .footer-links {
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
+}
+
+.shell-footer p,
+.shell-footer small {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .menu-trigger {

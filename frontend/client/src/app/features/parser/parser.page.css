@@ -1,32 +1,66 @@
 .parser-hero {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: clamp(2rem, 6vw, 5rem);
+  gap: clamp(2rem, 4vw, 3.5rem);
+  padding: clamp(2.5rem, 6vw, 5.5rem);
   border-radius: 2rem;
-  background: linear-gradient(135deg, var(--ink-900), #1d1c1a);
-  color: var(--sand-50);
-  margin-bottom: 3rem;
+  background: linear-gradient(140deg, rgba(63, 46, 34, 0.92), rgba(43, 65, 52, 0.88)),
+    radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.15), transparent 55%);
+  color: #fff;
+  margin-bottom: 3.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 35px 55px rgba(12, 8, 6, 0.4);
+  overflow: hidden;
+}
+
+.parser-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.12), transparent 40%);
+  pointer-events: none;
+}
+
+.parser-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.parser-hero h1 {
+  color: var(--sand-25, #fff);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.parser-hero p {
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+  max-width: 48ch;
 }
 
 .parser-hero .cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.85rem 1.75rem;
-  background: var(--sand-50);
+  padding: 0.95rem 1.9rem;
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 999px;
   color: var(--ink-900);
   text-decoration: none;
   font-weight: 600;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 15px 35px rgba(10, 7, 5, 0.35);
 }
 
 .parser-widget {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  backdrop-filter: blur(6px);
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 1.75rem;
+  padding: 1.75rem;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 35px rgba(8, 5, 3, 0.3);
 }
 
 .widget-label {
@@ -37,47 +71,54 @@
 }
 
 .widget-card {
-  margin-top: 1rem;
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  background: rgba(8, 7, 5, 0.6);
+  margin-top: 1.1rem;
+  padding: 1.6rem;
+  border-radius: 1.35rem;
+  background: rgba(6, 5, 4, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .widget-card ul {
   margin: 0;
   padding-left: 1.25rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
 }
 
 .status-pill {
   display: inline-block;
   margin-top: 1rem;
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 1.1rem;
   border-radius: 999px;
   font-size: 0.75rem;
-  background: var(--accent-pink);
+  background: rgba(255, 255, 255, 0.92);
   color: var(--ink-900);
   font-weight: 600;
+  box-shadow: 0 10px 25px rgba(9, 6, 4, 0.25);
 }
 
 .parser-steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 1.75rem;
+  margin-bottom: 2.5rem;
 }
 
 .parser-steps article {
-  border: 1px solid var(--ink-100);
+  border: 1px solid rgba(113, 89, 72, 0.2);
   border-radius: 1.25rem;
   padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 20px rgba(24, 16, 11, 0.08);
 }
 
 .parser-benefits {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
-  background: var(--sand-50);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(251, 244, 235, 0.96));
   border-radius: 1.5rem;
   padding: 1.5rem;
+  border: 1px solid rgba(113, 89, 72, 0.15);
+  box-shadow: 0 20px 30px rgba(24, 16, 11, 0.05);
 }

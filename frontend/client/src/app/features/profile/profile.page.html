@@ -1,21 +1,21 @@
 <section class="profile-hero">
   <div>
-    <p class="eyebrow">Maker space</p>
+    <p class="eyebrow">Maker space · Coming soon</p>
     <h1>{{ title }}</h1>
     <p class="lede">{{ subtitle }}</p>
     <div class="hero-actions">
-      <a routerLink="/parser" class="primary">Connect parser</a>
-      <a routerLink="/community" class="ghost">Visit community</a>
+      <a routerLink="/parser" class="primary" aria-disabled="true">Parser connection coming soon</a>
+      <a routerLink="/community" class="ghost" aria-disabled="true">Community access coming soon</a>
     </div>
   </div>
   <div class="profile-card" *ngIf="isPersonalSpace">
     <p>Quick pulse</p>
-    <h3>3 active projects</h3>
-    <p>Last focused session: 38 minutes ago</p>
+    <h3>Coming soon</h3>
+    <p>Personal stats will appear here after launch.</p>
   </div>
   <div class="profile-card" *ngIf="!isPersonalSpace">
     <p>Follow this maker</p>
-    <p>Stay updated when they share parser outputs or open critiques.</p>
+    <p>Following activity will unlock when community profiles go live.</p>
   </div>
 </section>
 
@@ -23,7 +23,7 @@
   <article *ngFor="let panel of panels">
     <h3>{{ panel.title }}</h3>
     <p>{{ panel.description }}</p>
-    <button type="button">{{ panel.cta }}</button>
+    <button type="button" disabled>{{ panel.cta }}</button>
   </article>
 </section>
 
@@ -33,3 +33,5 @@
     <p>{{ action.description }}</p>
   </article>
 </section>
+
+<p class="fine-print">Profiles and maker spaces are still in development—features on this page are placeholders.</p>

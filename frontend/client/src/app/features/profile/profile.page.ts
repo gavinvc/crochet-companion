@@ -27,30 +27,30 @@ export class ProfilePage {
   protected readonly isPersonalSpace = !this.handle;
   protected readonly title = this.isPersonalSpace ? 'Your maker space' : `${this.handle}'s studio`;
   protected readonly subtitle = this.isPersonalSpace
-    ? 'Track rows, sync parser outputs, and curate what the community sees.'
-    : 'A snapshot of current makes, parser sessions, and shared notes.';
+    ? 'Coming soon: track rows, sync parser outputs, and curate what the community sees.'
+    : 'Coming soon: snapshots of makes, parser sessions, and shared notes.';
 
   protected readonly panels: DashboardPanel[] = [
     {
       title: 'Active projects',
-      description: 'Live row tracking with session histories and yarn usage forecasts.',
-      cta: 'Open tracker'
+      description: 'Coming soon: live row tracking with session histories and yarn usage forecasts.',
+      cta: 'Coming soon'
     },
     {
       title: 'Parser drafts',
-      description: 'Convert pattern uploads into shareable, plain-language walkthroughs.',
-      cta: 'View drafts'
+      description: 'Coming soon: convert pattern uploads into shareable, plain-language walkthroughs.',
+      cta: 'Coming soon'
     },
     {
       title: 'Collab invites',
-      description: 'Approve guest editors, co-host workshops, or share limited-time links.',
-      cta: 'Manage invites'
+      description: 'Coming soon: approve guest editors, co-host workshops, or share limited-time links.',
+      cta: 'Coming soon'
     }
   ];
 
   protected readonly actions: QuickAction[] = [
-    { label: 'Share handle', description: 'Invite others to follow your updates and stash drops.' },
-    { label: 'Request critique', description: 'Ping the pattern club for focused feedback.' },
-    { label: 'Sync parser', description: 'Pair a parser output with this space for quick jumps.' }
+    { label: 'Share handle', description: 'Coming soon: invite others to follow your updates and stash drops.' },
+    { label: 'Request critique', description: 'Coming soon: ping the pattern club for focused feedback.' },
+    { label: 'Sync parser', description: 'Coming soon: pair a parser output with this space for quick jumps.' }
   ];
 }

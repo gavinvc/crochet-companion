@@ -1,23 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=General+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap');
 @import "tailwindcss";
 
 :root {
-	--ink-950: #080604;
-	--ink-900: #161210;
-	--ink-800: #2a2320;
-	--ink-600: #4b3f38;
-	--ink-500: #6d5f58;
-	--ink-200: #d7cdc7;
-	--ink-100: #ebe3df;
-	--ink-50: #f8f4f2;
-	--sand-100: #fdf8f4;
-	--sand-50: #fffdfb;
-	--sand-200: #f3ece7;
-	--accent-pink: #f8a8d8;
-	--accent-gold: #f6d48b;
-	--accent-gradient: linear-gradient(120deg, #f8a8d8, #f6d48b);
-	--plum-700: #3b1f2b;
-	--display-font: 'Space Grotesk', 'General Sans', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+	--ink-950: #16110d;
+	--ink-900: #201710;
+	--ink-800: #2c1f18;
+	--ink-700: #3b2b22;
+	--ink-600: #513c31;
+	--ink-500: #715948;
+	--ink-300: #b8967f;
+	--ink-200: #dac6b6;
+	--ink-100: #f0e4d9;
+	--ink-50: #fffcf8;
+	--sand-200: #f2e3d6;
+	--sand-100: #fbf3ea;
+	--sand-50: #fffaf5;
+	--accent-pink: #f4c2b3;
+	--accent-rose: #f1b7c8;
+	--accent-sage: #c6d7c5;
+	--accent-moss: #4f6650;
+	--accent-clay: #cda47d;
+	--accent-gold: #f2d7a0;
+	--accent-gradient: linear-gradient(130deg, #f4c2b3, #cddcc7);
+	--night-gradient: linear-gradient(140deg, #493528, #2b1e17);
+	--paper-grain: radial-gradient(circle at 20% 20%, rgba(244, 194, 179, 0.25), transparent 45%),
+		radial-gradient(circle at 80% 0%, rgba(198, 215, 197, 0.25), transparent 30%),
+		repeating-linear-gradient(120deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 8px);
+	--display-font: 'Fraunces', 'Space Grotesk', 'General Sans', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 	--body-font: 'General Sans', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -33,16 +42,17 @@ body {
 	margin: 0;
 	min-height: 100vh;
 	font-family: var(--body-font);
-	background: radial-gradient(circle at 20% 20%, rgba(248, 168, 216, 0.12), transparent 45%),
-		radial-gradient(circle at 80% 0%, rgba(246, 212, 139, 0.18), transparent 30%),
-		var(--sand-50);
+	background: var(--paper-grain), var(--sand-50);
+	background-attachment: fixed;
 	color: var(--ink-900);
 	line-height: 1.6;
 	-webkit-font-smoothing: antialiased;
 }
 
 a {
-	color: inherit;
+	color: var(--ink-900);
+	text-decoration-color: rgba(244, 194, 179, 0.6);
+	text-decoration-thickness: 2px;
 }
 
 img {
@@ -50,17 +60,13 @@ img {
 	display: block;
 }
 
-button,
-input,
-textarea,
-select {
-	font: inherit;
-}
-
 .page-container {
 	width: min(1200px, 100%);
 	margin: 0 auto;
 	padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem);
+	background: rgba(255, 255, 255, 0.6);
+	border-radius: 2rem;
+	backdrop-filter: blur(4px);
 }
 
 .badge {
@@ -72,4 +78,46 @@ select {
 	font-size: 0.8rem;
 	text-transform: uppercase;
 	letter-spacing: 0.2em;
+}
+
+.fine-print {
+	margin-top: 1.5rem;
+	font-size: 0.85rem;
+	color: var(--ink-500);
+	text-align: center;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--display-font);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	color: var(--ink-900);
+}
+
+p,
+li,
+small {
+	color: var(--ink-600);
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+	border-radius: 0.85rem;
+}
+
+::selection {
+	background: rgba(244, 194, 179, 0.4);
+	color: var(--ink-900);
+}
+
+[aria-disabled="true"] {
+	opacity: 0.6;
+	cursor: not-allowed;
+	pointer-events: none;
 }

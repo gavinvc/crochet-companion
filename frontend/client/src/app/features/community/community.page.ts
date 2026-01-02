@@ -25,31 +25,31 @@ export class CommunityPage {
   protected readonly streams: CommunityStream[] = [
     {
       title: 'Pattern club critiques',
-      summary: 'Weekly studio calls where we share WIPs, troubleshoot rows, and trade fiber wisdom.',
-      cadence: 'Thursdays · Live'
+      summary: 'Coming soon: weekly studio calls for WIPs, troubleshooting, and fiber wisdom.',
+      cadence: 'Launching soon'
     },
     {
       title: 'Slow make circles',
-      summary: 'Seasonal accountability chats that pair journal prompts with mindful crochet sessions.',
-      cadence: 'Daily threads · Async'
+      summary: 'Coming soon: seasonal accountability chats with journal prompts and mindful crochet sessions.',
+      cadence: 'Launching soon'
     },
     {
       title: 'Drop-in office hours',
-      summary: 'Ask for parser help, yarn subs, or business advice in a focused 25-minute slot.',
-      cadence: 'Weekdays · 10 slots'
+      summary: 'Coming soon: focused slots for parser help, yarn subs, or business advice.',
+      cadence: 'Launching soon'
     }
   ];
 
   protected readonly spotlights: Spotlight[] = [
     {
-      name: 'Layla P.',
-      project: 'Solar flare shawl',
-      detail: 'Used parser annotations to launch a mini-collection and sold 120 kits.'
+      name: 'Your name here',
+      project: 'Future spotlight',
+      detail: 'We will showcase real makers once the community beta opens.'
     },
     {
-      name: 'The Gentle Loop Coop',
-      project: 'Community heirloom drive',
-      detail: 'Coordinated 48 makers to deliver blankets with live progress maps.'
+      name: 'Community collaborations',
+      project: 'Coming soon',
+      detail: 'Collaborative drives and showcases will appear here after launch.'
     }
   ];
 }

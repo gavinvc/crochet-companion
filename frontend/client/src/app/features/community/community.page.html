@@ -1,11 +1,12 @@
 <section class="community-hero">
   <div>
     <p class="eyebrow">Community</p>
-    <h1>Gatherings that respect your pace.</h1>
+    <h1>Community gatherings coming soon.</h1>
     <p class="lede">
-      Join critique tables, async studio notes, and focus circles designed for crocheters who blend art with everyday life.
+      We are designing critique tables, async studio notes, and focus circles now. Join the waitlist and be the
+      first to know when these spaces open.
     </p>
-    <a routerLink="/auth" class="cta">Reserve a seat</a>
+    <a routerLink="/auth" class="cta" aria-disabled="true">Join the waitlist</a>
   </div>
   <div class="spotlights">
     <article *ngFor="let spotlight of spotlights">
@@ -23,3 +24,5 @@
     <p>{{ stream.summary }}</p>
   </article>
 </section>
+
+<p class="fine-print">Community programming is in development—details are placeholders until launch.</p>
