@@ -1,46 +1,105 @@
-<section class="patterns-hero">
-  <div>
-    <p class="eyebrow">Pattern Library</p>
-    <h1>Curated journeys coming soon.</h1>
-    <p class="lede">
-      We are building guided playlists you can filter by intention, pace, or yarn story. Add your name to the
-      waitlist to learn when the library opens.
-    </p>
-    <div class="filters">
-      <button type="button" *ngFor="let filter of quickFilters">{{ filter }}</button>
-    </div>
-    <div class="hero-stats">
-      <div class="stat" *ngFor="let stat of heroStats">
-        <p class="value">{{ stat.value }}</p>
-        <p class="label">{{ stat.label }}</p>
+<div class="patterns-page">
+  <section class="patterns-hero">
+    <div>
+      <p class="eyebrow">Pattern sharing</p>
+      <h1>Share your pattern with images and rows everyone can walk through.</h1>
+      <p class="lede">
+        Publish a pattern with a cover image and numbered rows. Makers can follow it or open the row-by-row view just like a parsed pattern.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <p class="value">Row-by-row</p>
+          <p class="label">Guided playback</p>
+        </div>
+        <div class="stat">
+          <p class="value">Images</p>
+          <p class="label">Showcase your work</p>
+        </div>
+        <div class="stat">
+          <p class="value">Follow</p>
+          <p class="label">Save for later</p>
+        </div>
       </div>
     </div>
-  </div>
-  <article class="hero-card">
-    <p class="card-label">Daily drop · Coming soon</p>
-    <h3>Soft geometry throw</h3>
-    <p>
-      This slot will highlight real community releases once the library is live.
-    </p>
-    <a routerLink="/parser">Parse a pattern now</a>
-  </article>
-</section>
 
-<section class="collections-grid">
-  <article class="collection" *ngFor="let collection of collections">
-    <span class="pill">{{ collection.tag }}</span>
-    <h3>{{ collection.title }}</h3>
-    <p>{{ collection.summary }}</p>
-    <small>{{ collection.meta }}</small>
-  </article>
-</section>
+    <article class="share-card" *ngIf="auth.isLoggedIn(); else shareSignIn">
+      <p class="card-label">Share a pattern</p>
+      <form [formGroup]="shareForm" (ngSubmit)="sharePattern()" novalidate>
+        <label>
+          <span>Title</span>
+          <input formControlName="title" placeholder="e.g., Cozy Moss Stitch Throw" />
+        </label>
 
-<section class="patterns-cta">
-  <div>
-    <h2>Need something bespoke?</h2>
-    <p>Custom parser collaborations are in progress—use Pattern Parser today and tell us what you need next.</p>
-  </div>
-  <a routerLink="/parser" class="cta-link">Open Pattern Parser</a>
-</section>
+        <label>
+          <span>Description</span>
+          <textarea formControlName="description" rows="2" placeholder="Short description"></textarea>
+        </label>
 
-<p class="fine-print">Pattern stats and showcases are placeholders until the public release.</p>
+        <label>
+          <span>Image URL (optional)</span>
+          <input formControlName="imageUrl" placeholder="https://..." />
+        </label>
+
+        <label>
+          <span>Rows (one per line)</span>
+          <textarea formControlName="rowsInput" rows="5" placeholder="Row 1: ...&#10;Row 2: ..."></textarea>
+        </label>
+
+        <button type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Saving...' : 'Publish pattern' }}</button>
+      </form>
+    </article>
+    <ng-template #shareSignIn>
+      <article class="share-card">
+        <p class="card-label">Sign in to share</p>
+        <p class="lede">Create an account to publish patterns with images and rows.</p>
+        <a routerLink="/auth" class="cta">Go to sign in</a>
+      </article>
+    </ng-template>
+  </section>
+
+  <section class="pattern-list">
+    <header>
+      <p class="eyebrow">Community patterns</p>
+      <h2>Follow or open any shared pattern.</h2>
+      <p *ngIf="error()" class="error">{{ error() }}</p>
+    </header>
+
+    <div *ngIf="isLoading()" class="loading">Loading patterns...</div>
+
+    <div *ngIf="!isLoading() && patterns().length === 0" class="empty">No patterns shared yet. Be the first to publish.</div>
+
+    <div class="pattern-grid" *ngIf="patterns().length > 0">
+      <article class="pattern-card" *ngFor="let pattern of patterns()">
+        <div class="cover" *ngIf="pattern.imageUrl; else placeholder" [style.backgroundImage]="'url(' + pattern.imageUrl + ')'">
+          <span class="pill">{{ rowsPreview(pattern) }}</span>
+        </div>
+        <ng-template #placeholder>
+          <div class="cover placeholder">
+            <span class="pill">{{ rowsPreview(pattern) }}</span>
+          </div>
+        </ng-template>
+
+        <div class="card-body">
+          <div class="card-title">
+            <h3>{{ pattern.title }}</h3>
+            <p>{{ pattern.description || 'No description provided.' }}</p>
+          </div>
+
+          <div class="meta">
+            <span>By {{ pattern.author.handle }}</span>
+            <span>Followers: {{ pattern.followerCount }}</span>
+          </div>
+
+          <div class="actions">
+            <button type="button" (click)="toggleFollow(pattern)" [disabled]="!auth.isLoggedIn()">
+              {{ pattern.isFollowing ? 'Unfollow' : 'Follow' }}
+            </button>
+            <button type="button" (click)="openPattern(pattern)" [class.secondary]="!auth.isLoggedIn()">
+              {{ auth.isLoggedIn() ? 'Open' : 'Sign in to view' }}
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

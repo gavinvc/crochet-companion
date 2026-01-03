@@ -12,6 +12,12 @@ export const routes: Routes = [
 				loadComponent: () => import('./features/home/home.page').then(m => m.HomePage)
 			},
 			{
+				path: 'patterns/:patternId',
+				canActivate: [authGuard],
+				data: { requiresAuth: true },
+				loadComponent: () => import('./features/patterns/pattern-detail.page').then(m => m.PatternDetailPage)
+			},
+			{
 				path: 'patterns',
 				loadComponent: () => import('./features/patterns/patterns.page').then(m => m.PatternsPage)
 			},
