@@ -1,6 +1,6 @@
 <div class="patterns-page">
   <section class="patterns-hero">
-    <div>
+    <div class="patterns-hero__copy">
       <p class="eyebrow">Pattern sharing</p>
       <h1>Share your pattern with images and rows everyone can walk through.</h1>
       <p class="lede">
@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <article class="share-card" id="share-form" *ngIf="auth.isLoggedIn(); else shareSignIn">
+    <article class="share-card share-card--form" id="share-form" *ngIf="auth.isLoggedIn(); else shareSignIn">
       <p class="card-label">Share a pattern</p>
       <form [formGroup]="shareForm" (ngSubmit)="sharePattern()" novalidate>
         <label>
@@ -49,7 +49,7 @@
       </form>
     </article>
     <ng-template #shareSignIn>
-      <article class="share-card">
+      <article class="share-card share-card--signin">
         <p class="card-label">Sign in to share</p>
         <p class="lede">Create an account to publish patterns with images and rows.</p>
         <a routerLink="/auth" class="cta">Go to sign in</a>

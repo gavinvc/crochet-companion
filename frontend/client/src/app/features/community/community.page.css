@@ -1,14 +1,26 @@
 .community-hero {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
+  gap: clamp(1.75rem, 5vw, 3rem);
   padding: clamp(2rem, 6vw, 5rem);
   border-radius: 2rem;
   background: linear-gradient(135deg, rgba(79, 102, 80, 0.92), rgba(59, 43, 34, 0.95));
-  color: var(--sand-50);
-  margin-bottom: 3rem;
+  color: #ffffff;
+  margin: 0 calc(50% - 50vw) 3rem;
+  width: 100vw;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 30px 50px rgba(15, 10, 7, 0.25);
+}
+
+.community-hero__copy {
+  max-width: 640px;
+  color: #fff;
+}
+
+.community-hero .eyebrow,
+.community-hero h1,
+.community-hero .lede {
+  color: #ffffff;
 }
 
 .community-hero .cta {
@@ -21,6 +33,7 @@
   font-weight: 600;
   margin-top: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
 
 .spotlights {
@@ -34,6 +47,8 @@
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
+  color: #f9f7f3;
+  line-height: 1.6;
 }
 
 .spotlights .project {
@@ -47,6 +62,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.5rem;
+  padding: 0 clamp(1.5rem, 5vw, 3rem) 0;
 }
 
 .community-streams article {
@@ -55,6 +71,8 @@
   padding: 1.5rem;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(253, 249, 244, 0.95));
   box-shadow: 0 15px 30px rgba(24, 16, 11, 0.05);
+  color: var(--ink-900);
+  line-height: 1.65;
 }
 
 .cadence {
