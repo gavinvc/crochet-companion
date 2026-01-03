@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const pdfParse = require('pdf-parse');
 const { parsePatternWithLLM } = require('../services/llm.service');
 
 const MAX_TEXT_LENGTH = 15000;
@@ -10,7 +11,22 @@ const parserSchema = z.object({
   title: z.string().max(120).optional()
 });
 
+const pdfSchema = z.object({
+  data: z.string().min(10, 'PDF data is required (base64 string)'),
+  filename: z.string().optional(),
+  title: z.string().max(120).optional()
+});
+
 const normalizeWhitespace = (text) => text.replace(/\s+/g, ' ').trim();
+
+const looksLikePdf = (content) => {
+  if (!content || typeof content !== 'string') return false;
+  const trimmed = content.trim();
+  if (trimmed.startsWith('%PDF')) return true; // raw PDF header
+  if (/^JVBER/i.test(trimmed)) return true; // base64 for %PDF
+  if (trimmed.startsWith('data:application/pdf')) return true; // data URI
+  return false;
+};
 
 const stripHtml = (html) => {
   const withoutScripts = html
@@ -59,6 +75,12 @@ const parsePattern = async (req, res, next) => {
 
     const { inputType, content, title } = parsed.data;
 
+    if (looksLikePdf(content)) {
+      return res
+        .status(400)
+        .json({ message: 'PDF detected. Use the PDF upload flow so we can extract text before parsing.' });
+    }
+
     let sourceText = content;
     let sourceUrl;
 
@@ -88,6 +110,41 @@ const parsePattern = async (req, res, next) => {
   }
 };
 
+const parsePatternPdf = async (req, res, next) => {
+  try {
+    const parsed = pdfSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
+    }
+
+    const { data, filename, title } = parsed.data;
+    let text;
+    try {
+      const buffer = Buffer.from(data, 'base64');
+      const { text: extracted } = await pdfParse(buffer);
+      text = normalizeWhitespace(extracted || '');
+    } catch (err) {
+      return res.status(400).json({ message: 'Unable to read PDF. Ensure it is a valid PDF file.' });
+    }
+
+    if (!text || text.length < 6) {
+      return res.status(400).json({ message: 'No readable text found in the PDF.' });
+    }
+
+    const truncated = text.slice(0, MAX_TEXT_LENGTH);
+
+    const result = await parsePatternWithLLM({
+      text: truncated,
+      meta: { sourceType: 'pdf', title: title || filename || null, sourceUrl: null }
+    });
+
+    return res.json(result);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
-  parsePattern
+  parsePattern,
+  parsePatternPdf
 };

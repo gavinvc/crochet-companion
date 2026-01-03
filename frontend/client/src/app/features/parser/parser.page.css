@@ -154,6 +154,11 @@
   resize: vertical;
 }
 
+.field .field-hint {
+  color: var(--ink-700);
+  font-size: 0.9rem;
+}
+
 .form-actions {
   display: flex;
   align-items: center;

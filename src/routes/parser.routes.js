@@ -1,8 +1,9 @@
 const express = require('express');
-const { parsePattern } = require('../controllers/parser.controller');
+const { parsePattern, parsePatternPdf } = require('../controllers/parser.controller');
 
 const router = express.Router();
 
 router.post('/parse', parsePattern);
+router.post('/parse-pdf', parsePatternPdf);
 
 module.exports = router;

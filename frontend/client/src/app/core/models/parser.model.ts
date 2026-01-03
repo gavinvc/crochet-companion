@@ -1,8 +1,14 @@
-export type PatternInputType = 'text' | 'url';
+export type PatternInputType = 'text' | 'url' | 'pdf';
 
 export interface PatternParseRequest {
   inputType: PatternInputType;
   content: string;
+  title?: string;
+}
+
+export interface PatternParsePdfRequest {
+  data: string; // base64-encoded PDF
+  filename?: string;
   title?: string;
 }
 

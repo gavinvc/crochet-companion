@@ -49,8 +49,10 @@ const buildPrompt = (text, meta) => {
       'Each row must include rowNumber (int), instruction (plain-language, complete), stitches (array of stitch names), and optional notes.',
       'Do not place warnings inside rows; warnings must go in the top-level warnings array only.',
       'Assume the input may be out of order due to copy/paste; read the entire text and produce a logically ordered, complete pattern.',
-      'Expand shorthand or implied repeats into explicit instructions, including inferred repeat counts when language implies repetition (e.g., "repeat Row 2" or continued sections).',
-      'If any detail is missing, make a best-effort, concise guess, and record that in warnings.',
+      'Each row must include the full start, middle, repeat-until-end behavior, and end-of-row action (e.g., turn/join/continue). Do not stop mid-row; include how the row ends.',
+      'Expand shorthand or implied repeats into explicit instructions, including inferred repeat counts or "repeat to end" when language implies repetition (e.g., "* pattern * across", "repeat Row 2"), and state the end-of-row action. Do not leave rows hanging at "until last X sts"—finish the row explicitly.',
+      'If any detail is missing, make a best-effort, concise guess for the complete row and record the assumption in warnings.',
+      'Include a confidence note in warnings when confidence is below 0.8 (e.g., "Confidence ~0.65: inferred repeats and endings"), especially if the pattern may be incomplete.',
       'Limit to 200 rows and keep instructions actionable; no prose beyond the JSON.'
     ].join(' '),
     user: `${intro}\n\nRaw pattern:\n${text}`

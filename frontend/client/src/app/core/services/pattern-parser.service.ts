@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../config/environment';
-import { PatternParseRequest, PatternParseResponse } from '../models/parser.model';
+import { PatternParsePdfRequest, PatternParseRequest, PatternParseResponse } from '../models/parser.model';
 
 @Injectable({ providedIn: 'root' })
 export class PatternParserService {
@@ -13,5 +13,9 @@ export class PatternParserService {
 
   parse(request: PatternParseRequest): Observable<PatternParseResponse> {
     return this.http.post<PatternParseResponse>(`${this.baseUrl}/parse`, request);
+  }
+
+  parsePdf(request: PatternParsePdfRequest): Observable<PatternParseResponse> {
+    return this.http.post<PatternParseResponse>(`${this.baseUrl}/parse-pdf`, request);
   }
 }

@@ -21,9 +21,13 @@
             <input type="radio" value="text" formControlName="inputType" />
             Paste text
           </label>
-          <label class="disabled" title="URL fetch is coming soon. Paste text for now.">
-            <input type="radio" value="url" formControlName="inputType" [disabled]="true" />
-            Fetch from URL (coming soon)
+          <label title="Fetch a public pattern page"> 
+            <input type="radio" value="url" formControlName="inputType" />
+            Fetch from URL
+          </label>
+          <label title="Upload a PDF pattern">
+            <input type="radio" value="pdf" formControlName="inputType" />
+            Upload PDF
           </label>
         </div>
       </header>
@@ -33,19 +37,34 @@
         <input formControlName="title" placeholder="e.g., Cozy Moss Stitch Throw" />
       </label>
 
-      <label class="field" *ngIf="form.controls.inputType.value === 'text'; else urlField">
-        <span>Pattern text</span>
-        <textarea
-          formControlName="content"
-          rows="8"
-          placeholder="Paste a few rows or the full pattern text"
-        ></textarea>
-      </label>
+      <ng-container [ngSwitch]="form.controls.inputType.value">
+        <label class="field" *ngSwitchCase="'text'">
+          <span>Pattern text</span>
+          <textarea
+            formControlName="content"
+            rows="8"
+            placeholder="Paste a few rows or the full pattern text"
+          ></textarea>
+        </label>
+
+        <ng-container *ngSwitchCase="'url'" [ngTemplateOutlet]="urlField"></ng-container>
+        <ng-container *ngSwitchCase="'pdf'" [ngTemplateOutlet]="pdfField"></ng-container>
+        <ng-container *ngSwitchDefault [ngTemplateOutlet]="urlField"></ng-container>
+      </ng-container>
 
       <ng-template #urlField>
         <label class="field">
           <span>Pattern URL</span>
           <input formControlName="content" type="url" placeholder="https://designer-site.com/pattern" />
+          <small class="field-hint">Public pages only; best results on simple text-based articles.</small>
+        </label>
+      </ng-template>
+
+      <ng-template #pdfField>
+        <label class="field">
+          <span>PDF file</span>
+          <input type="file" accept="application/pdf" (change)="onFileSelected($event)" />
+          <small class="field-hint">We extract text from the PDF before parsing; scanned images are not supported.</small>
         </label>
       </ng-template>
 
