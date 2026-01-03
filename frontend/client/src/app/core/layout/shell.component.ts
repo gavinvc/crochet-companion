@@ -23,7 +23,6 @@ export class ShellComponent {
 
   protected readonly navItems = [
     { label: 'Patterns', href: '/patterns' },
-    { label: 'Pattern Parser', href: '/parser' },
     { label: 'Community', href: '/community' }
   ];
 
