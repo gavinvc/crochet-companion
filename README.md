@@ -46,8 +46,15 @@ MONGODB_URI=mongodb://127.0.0.1:27017/crochet-companion
 JWT_SECRET=replace-with-a-long-random-string
 JWT_EXPIRES_IN=7d
 CLIENT_ORIGIN=http://localhost:4200
-OPENAI_API_KEY=replace-with-your-api-key
-OPENAI_MODEL=gpt-4o-mini
+
+# Pattern parser LLM (local-first)
+LLM_PROVIDER=ollama           # options: ollama | huggingface
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2:1b
+
+# Optional remote fallback (only if LLM_PROVIDER=huggingface)
+HF_TOKEN=<your-hf-token>
+HF_MODEL=meta-llama/Llama-3.2-1B-Instruct
 ```
 
 You can set multiple allowed origins by comma separating them (e.g. `CLIENT_ORIGIN=http://localhost:4200,https://crochet-companion.vercel.app`).

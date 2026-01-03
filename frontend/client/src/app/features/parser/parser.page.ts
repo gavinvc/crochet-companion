@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 
@@ -13,6 +13,8 @@ import { PatternInputType, PatternParseResponse } from '../../core/models/parser
   styleUrl: './parser.page.css'
 })
 export class ParserPage {
+  @ViewChild('resultsSection') private resultsSection?: ElementRef<HTMLElement>;
+
   private readonly fb = inject(FormBuilder);
   private readonly parser = inject(PatternParserService);
 
@@ -52,14 +54,19 @@ export class ParserPage {
 
     this.isLoading.set(true);
     this.error.set(null);
+    this.result.set(null);
+    this.activeRowIndex.set(0);
 
     const payload = this.form.getRawValue();
+
+    this.scrollToResults(true);
 
     this.parser.parse(payload).subscribe({
       next: response => {
         this.result.set(response);
         this.activeRowIndex.set(0);
         this.isLoading.set(false);
+        this.scrollToResults();
       },
       error: err => {
         this.error.set(this.extractMessage(err));
@@ -85,6 +92,18 @@ export class ParserPage {
 
   protected hasResult(): boolean {
     return this.rows().length > 0;
+  }
+
+  protected scrollToResults(triggeredBySubmit = false): void {
+    const scroll = () => {
+      const el = this.resultsSection?.nativeElement || document.querySelector('#results-section');
+      if (!el) return;
+      const rect = (el as HTMLElement).getBoundingClientRect();
+      const top = rect.top + window.scrollY - 12;
+      window.scrollTo({ top, behavior: triggeredBySubmit ? 'smooth' : 'smooth' });
+    };
+
+    requestAnimationFrame(() => setTimeout(scroll, 0));
   }
 
   private extractMessage(error: unknown): string {

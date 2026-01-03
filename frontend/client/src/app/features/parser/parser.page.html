@@ -21,9 +21,9 @@
             <input type="radio" value="text" formControlName="inputType" />
             Paste text
           </label>
-          <label>
-            <input type="radio" value="url" formControlName="inputType" />
-            Fetch from URL
+          <label class="disabled" title="URL fetch is coming soon. Paste text for now.">
+            <input type="radio" value="url" formControlName="inputType" [disabled]="true" />
+            Fetch from URL (coming soon)
           </label>
         </div>
       </header>
@@ -50,15 +50,27 @@
       </ng-template>
 
       <div class="form-actions">
-        <button type="submit" [disabled]="isLoading()">{{ isLoading() ? 'Parsing...' : 'Parse pattern' }}</button>
+        <button type="submit" [disabled]="isLoading()">{{ isLoading() ? 'Parsing… (can take ~40s)' : 'Parse pattern' }}</button>
+        <p *ngIf="isLoading()" class="loading-hint">Working on it… larger patterns can take a bit.</p>
         <p *ngIf="error()" class="error">{{ error() }}</p>
       </div>
     </form>
   </div>
 </section>
 
-<section class="parser-results" *ngIf="hasResult(); else emptyState">
-  <div class="result-summary" *ngIf="result() as parsed">
+<section #resultsSection id="results-section" class="parser-results" *ngIf="isLoading() || hasResult(); else emptyState">
+  <div class="deployment-warning">
+    <p class="eyebrow">Heads up</p>
+    <p class="warning-text">Local LLM is required. Vercel dev/staging won’t return parser results until pointed at your self-hosted model.</p>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading-panel">
+    <p class="eyebrow">Parsing pattern</p>
+    <p class="lede">Cozying up your rows… this can take a bit for longer patterns.</p>
+    <div class="loading-shimmer"></div>
+  </div>
+
+  <div class="result-summary" *ngIf="!isLoading() && result() as parsed">
     <p class="eyebrow">Summary</p>
     <p class="lede">{{ parsed.summary || 'Rows generated from your pattern.' }}</p>
     <p class="source">Source: {{ parsed.sourceTitle || 'Untitled pattern' }} · {{ parsed.sourceType | uppercase }}</p>
@@ -68,7 +80,7 @@
     </ul>
   </div>
 
-  <div class="row-viewer" *ngIf="activeRow() as row">
+  <div class="row-viewer" *ngIf="!isLoading() && activeRow() as row">
     <div class="row-list">
       <button
         type="button"
