@@ -12,22 +12,22 @@ import { RouterLink } from '@angular/router';
 export class HomePage {
   protected readonly featurePillars = [
     {
-      title: 'Profiles & following',
-      copy: 'Coming soon: claim a maker handle, showcase WIPs, and follow crocheters who inspire you.'
+      title: 'Pattern Parser',
+      copy: 'Paste text or drop a URL to get numbered rows with stitch callouts you can walk through at your pace.'
     },
     {
-      title: 'AI pattern parsing',
-      copy: 'Coming soon: paste any pattern and watch us build tidy, row-by-row checklists with stitch counts.'
+      title: 'Row tracking',
+      copy: 'Advance forward or backward without losing your place; tap rows to jump ahead and keep rhythm.'
     },
     {
       title: 'Sharing & feedback',
-      copy: 'Coming soon: publish patterns, gather notes, and spark conversations with detailed attachments.'
+      copy: 'Publish patterns, gather notes, and invite collaborators—built to keep feedback alongside your rows.'
     }
   ];
 
   protected readonly liveRowHighlights = [
-    'Coming soon: row-aware timer with rest reminders',
-    'Coming soon: smart stitch calculators for repeats',
-    'Coming soon: tap-to-complete tracking across devices'
+    'Row-by-row navigation with stitch names highlighted',
+    'Text or web URLs supported; PDFs coming soon',
+    'Warnings surfaced when the pattern is ambiguous'
   ];
 }

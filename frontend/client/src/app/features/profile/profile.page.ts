@@ -27,8 +27,8 @@ export class ProfilePage {
   protected readonly isPersonalSpace = !this.handle;
   protected readonly title = this.isPersonalSpace ? 'Your maker space' : `${this.handle}'s studio`;
   protected readonly subtitle = this.isPersonalSpace
-    ? 'Coming soon: track rows, sync parser outputs, and curate what the community sees.'
-    : 'Coming soon: snapshots of makes, parser sessions, and shared notes.';
+    ? 'Use Pattern Parser now; maker space dashboards and row history are coming next.'
+    : 'Profiles arrive soon; in the meantime Pattern Parser is ready for your patterns.';
 
   protected readonly panels: DashboardPanel[] = [
     {
@@ -51,6 +51,6 @@ export class ProfilePage {
   protected readonly actions: QuickAction[] = [
     { label: 'Share handle', description: 'Coming soon: invite others to follow your updates and stash drops.' },
     { label: 'Request critique', description: 'Coming soon: ping the pattern club for focused feedback.' },
-    { label: 'Sync parser', description: 'Coming soon: pair a parser output with this space for quick jumps.' }
+    { label: 'Sync parser', description: 'Coming soon: pair a Pattern Parser output with this space for quick jumps.' }
   ];
 }

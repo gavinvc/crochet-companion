@@ -22,9 +22,11 @@
 }
 
 .shell-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -131,6 +133,10 @@
 
 .shell-main {
   flex: 1;
+  padding-top: clamp(5.5rem, 8vh, 7.5rem);
+  padding-bottom: clamp(2rem, 4vh, 3rem);
+  background: var(--paper-grain), var(--sand-50);
+  background-attachment: fixed;
 }
 
 .shell-footer {
@@ -144,6 +150,8 @@
   gap: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   line-height: 1.7;
+  box-shadow: 0 -12px 30px rgba(4, 3, 2, 0.2);
+  margin-top: auto;
 }
 
 .shell-footer a {

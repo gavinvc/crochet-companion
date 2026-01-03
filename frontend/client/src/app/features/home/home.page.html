@@ -1,38 +1,35 @@
 <section class="hero">
   <div class="hero-copy">
     <p class="eyebrow">Modern crochet companion</p>
-    <h1>Coming soon: plan, parse, and track every stitch in one calm workspace.</h1>
-    <p class="lede">
-      We are actively building Crochet Companion, a calm workspace that will eventually pair expressive
-      community spaces with an AI row parser so you can focus on the yarn in your hands.
-    </p>
+    <h1>Follow every row with Pattern Parser.</h1>
+    <p class="lede">Paste text or drop a URL and we will turn it into numbered rows you can step through without losing your place.</p>
     <div class="hero-cta">
-      <a routerLink="/parser" class="primary" aria-disabled="true">Parser preview coming soon</a>
-      <a routerLink="/patterns" class="secondary" aria-disabled="true">Pattern library coming soon</a>
+      <a routerLink="/parser" class="primary">Open Pattern Parser</a>
+      <a routerLink="/patterns" class="secondary">Browse patterns</a>
     </div>
     <div class="signal">
       <span class="dot"></span>
-      <p>Live parser launching soon · Join the waitlist for updates</p>
+      <p>Pattern Parser is live for text and URLs; stitch tutorials are next.</p>
     </div>
   </div>
   <div class="hero-card">
     <p class="card-label">Prototype preview</p>
     <div class="card-row">
       <span>Row 12</span>
-      <p>"Coming soon: tidy row summaries with stitch counts"</p>
+      <p>Hdc in next 6 sts, ch 2, turn. Stitch names highlighted for quick scanning.</p>
     </div>
     <div class="card-row muted">
       <span>Row 13</span>
-      <p>"Coming soon: row-by-row reminders"</p>
+      <p>Rows stay in order with forward and back controls.</p>
     </div>
     <div class="card-metrics">
       <div>
-        <p class="stat">Coming soon</p>
-        <p class="label">Row tracking</p>
+        <p class="stat">Now live</p>
+        <p class="label">Pattern Parser</p>
       </div>
       <div>
-        <p class="stat">Coming soon</p>
-        <p class="label">Patterns parsed</p>
+        <p class="stat">URL + text</p>
+        <p class="label">Input types</p>
       </div>
     </div>
   </div>
@@ -49,10 +46,7 @@
   <header>
     <p class="eyebrow">Row-by-row companion</p>
     <h2>Parse any pattern, then walk row-by-row in real time.</h2>
-    <p>
-      Drop a link from your favorite designer or paste raw text—these parser superpowers are in active
-      development. Sign up to be notified when the live checklist experience is ready.
-    </p>
+    <p>Drop a link from your favorite designer or paste raw text. We normalize the pattern and surface rows with stitch callouts.</p>
   </header>
   <ul>
     <li *ngFor="let highlight of liveRowHighlights">{{ highlight }}</li>

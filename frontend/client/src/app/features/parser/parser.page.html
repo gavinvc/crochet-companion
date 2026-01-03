@@ -1,39 +1,110 @@
 <section class="parser-hero">
-  <div>
-    <p class="eyebrow">Live parser · Coming soon</p>
-    <h1>Plain-language clarity is on the way.</h1>
+  <div class="parser-lede">
+    <p class="eyebrow">Pattern Parser</p>
+    <h1>Turn any crochet pattern into step-by-step rows.</h1>
     <p class="lede">
-      We are prototyping tooling that will normalize scribbles, screenshots, and vintage charts so you can focus on stitching.
+      Paste raw text or point us at a URL. We will normalize the pattern into tidy, numbered rows so you can stitch at your own pace.
     </p>
-    <a routerLink="/auth" class="cta" aria-disabled="true">Join parser waitlist</a>
+    <ul class="hero-highlights">
+      <li>Row-by-row navigation with stitched terms called out</li>
+      <li>Works with plain text or web pages today</li>
+      <li>Future: tap stitches to open technique tutorials</li>
+    </ul>
   </div>
-  <div class="parser-widget">
-    <p class="widget-label">Prototype status</p>
-    <div class="widget-card">
-      <h3>Parser beta</h3>
-      <p>Feature development in progress</p>
-      <ul>
-        <li>Row grouping logic in development</li>
-        <li>Chart symbol translation planned</li>
-        <li>Yarn substitution research underway</li>
-      </ul>
-      <span class="status-pill">Coming soon</span>
+
+  <div class="parser-panel">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="parser-form">
+      <header>
+        <p class="eyebrow">Input</p>
+        <div class="input-switch">
+          <label>
+            <input type="radio" value="text" formControlName="inputType" />
+            Paste text
+          </label>
+          <label>
+            <input type="radio" value="url" formControlName="inputType" />
+            Fetch from URL
+          </label>
+        </div>
+      </header>
+
+      <label class="field">
+        <span>Pattern title (optional)</span>
+        <input formControlName="title" placeholder="e.g., Cozy Moss Stitch Throw" />
+      </label>
+
+      <label class="field" *ngIf="form.controls.inputType.value === 'text'; else urlField">
+        <span>Pattern text</span>
+        <textarea
+          formControlName="content"
+          rows="8"
+          placeholder="Paste a few rows or the full pattern text"
+        ></textarea>
+      </label>
+
+      <ng-template #urlField>
+        <label class="field">
+          <span>Pattern URL</span>
+          <input formControlName="content" type="url" placeholder="https://designer-site.com/pattern" />
+        </label>
+      </ng-template>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="isLoading()">{{ isLoading() ? 'Parsing...' : 'Parse pattern' }}</button>
+        <p *ngIf="error()" class="error">{{ error() }}</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="parser-results" *ngIf="hasResult(); else emptyState">
+  <div class="result-summary" *ngIf="result() as parsed">
+    <p class="eyebrow">Summary</p>
+    <p class="lede">{{ parsed.summary || 'Rows generated from your pattern.' }}</p>
+    <p class="source">Source: {{ parsed.sourceTitle || 'Untitled pattern' }} · {{ parsed.sourceType | uppercase }}</p>
+
+    <ul *ngIf="parsed.warnings?.length" class="warnings">
+      <li *ngFor="let warning of parsed.warnings">{{ warning }}</li>
+    </ul>
+  </div>
+
+  <div class="row-viewer" *ngIf="activeRow() as row">
+    <div class="row-list">
+      <button
+        type="button"
+        *ngFor="let item of rows(); let i = index"
+        (click)="selectRow(i)"
+        [class.active]="i === activeRowIndex()"
+      >
+        <span>Row {{ item.rowNumber }}</span>
+        <p>{{ item.instruction }}</p>
+      </button>
+    </div>
+
+    <div class="row-detail">
+      <div class="row-meta">
+        <p class="eyebrow">Row {{ row.rowNumber }}</p>
+        <div class="chips" *ngIf="row.stitches?.length">
+          <span *ngFor="let stitch of row.stitches">{{ stitch }}</span>
+        </div>
+      </div>
+      <p class="instruction">{{ row.instruction }}</p>
+      <p *ngIf="row.notes" class="notes">{{ row.notes }}</p>
+
+      <div class="row-nav">
+        <button type="button" (click)="prevRow()" [disabled]="activeRowIndex() === 0">Previous row</button>
+        <button type="button" (click)="nextRow()" [disabled]="activeRowIndex() >= rows().length - 1">
+          Next row
+        </button>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="parser-steps">
-  <article *ngFor="let step of steps">
-    <h3>{{ step.title }}</h3>
-    <p>{{ step.detail }}</p>
-  </article>
-</section>
-
-<section class="parser-benefits">
-  <article *ngFor="let benefit of benefits">
-    <h4>{{ benefit.label }}</h4>
-    <p>{{ benefit.description }}</p>
-  </article>
-</section>
-
-<p class="fine-print">Parser capabilities are in development; visuals reflect our roadmap, not live data.</p>
+<ng-template #emptyState>
+  <section class="empty-state">
+    <p class="eyebrow">Pattern Parser</p>
+    <h2>Paste text or a URL to see rows appear here.</h2>
+    <p>We will break your pattern into numbered steps with stitch names highlighted.</p>
+  </section>
+</ng-template>

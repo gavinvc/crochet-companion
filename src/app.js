@@ -5,6 +5,7 @@ const morgan = require('morgan');
 
 const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
+const parserRoutes = require('./routes/parser.routes');
 
 const buildApp = () => {
   const app = express();
@@ -22,6 +23,7 @@ const buildApp = () => {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/profiles', profileRoutes);
+  app.use('/api/parser', parserRoutes);
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Route not found' });

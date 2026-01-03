@@ -1,34 +1,108 @@
-import { Component } from '@angular/core';
-import { NgFor } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { NgFor, NgIf, UpperCasePipe } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 
-type ParserStep = {
-  title: string;
-  detail: string;
-};
-
-type ParserBenefit = {
-  label: string;
-  description: string;
-};
+import { PatternParserService } from '../../core/services/pattern-parser.service';
+import { PatternInputType, PatternParseResponse } from '../../core/models/parser.model';
 
 @Component({
   selector: 'app-parser-page',
   standalone: true,
-  imports: [NgFor, RouterLink],
+  imports: [NgIf, NgFor, UpperCasePipe, ReactiveFormsModule],
   templateUrl: './parser.page.html',
   styleUrl: './parser.page.css'
 })
 export class ParserPage {
-  protected readonly steps: ParserStep[] = [
-    { title: 'Drop in any pattern format', detail: 'Coming soon: paste, upload, or link to PDFs and notes with auto-detected abbreviations.' },
-    { title: 'Let the parser normalize', detail: 'Coming soon: chart translation, stitch math, and errata surfacing.' },
-    { title: 'Track rows live', detail: 'Coming soon: send cleaned patterns to your maker space with live tracking.' }
-  ];
+  private readonly fb = inject(FormBuilder);
+  private readonly parser = inject(PatternParserService);
 
-  protected readonly benefits: ParserBenefit[] = [
-    { label: 'Chart → text', description: 'Coming soon: readable, mobile-friendly directions generated instantly.' },
-    { label: 'Fiber-aware', description: 'Coming soon: hook, yarn, and gauge guidance based on your stash profile.' },
-    { label: 'Collaboration', description: 'Coming soon: share a parsing room with co-makers and annotate together.' }
-  ];
+  protected readonly form = this.fb.group({
+    inputType: this.fb.control<PatternInputType>('text', { nonNullable: true }),
+    title: this.fb.control<string>('', { nonNullable: true }),
+    content: this.fb.control<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(10)]
+    })
+  });
+
+  protected readonly isLoading = signal(false);
+  protected readonly error = signal<string | null>(null);
+  protected readonly result = signal<PatternParseResponse | null>(null);
+  protected readonly activeRowIndex = signal(0);
+  protected readonly rows = computed(() => this.result()?.rows ?? []);
+  protected readonly activeRow = computed(() => this.rows()[this.activeRowIndex()] ?? null);
+
+  constructor() {
+    this.form.controls.inputType.valueChanges.subscribe(type => {
+      const control = this.form.controls.content;
+      if (type === 'url') {
+        control.setValidators([Validators.required, Validators.pattern(/^https?:\/\//i)]);
+      } else {
+        control.setValidators([Validators.required, Validators.minLength(10)]);
+      }
+      control.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  protected submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    const payload = this.form.getRawValue();
+
+    this.parser.parse(payload).subscribe({
+      next: response => {
+        this.result.set(response);
+        this.activeRowIndex.set(0);
+        this.isLoading.set(false);
+      },
+      error: err => {
+        this.error.set(this.extractMessage(err));
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  protected selectRow(index: number): void {
+    if (index < 0 || index >= this.rows().length) {
+      return;
+    }
+    this.activeRowIndex.set(index);
+  }
+
+  protected prevRow(): void {
+    this.selectRow(this.activeRowIndex() - 1);
+  }
+
+  protected nextRow(): void {
+    this.selectRow(this.activeRowIndex() + 1);
+  }
+
+  protected hasResult(): boolean {
+    return this.rows().length > 0;
+  }
+
+  private extractMessage(error: unknown): string {
+    if (typeof error === 'object' && error && 'error' in error) {
+      const payload = (error as { error?: Record<string, unknown> }).error;
+      if (payload && typeof payload === 'object') {
+        if ('message' in payload) {
+          return String(payload['message']);
+        }
+        if ('errors' in payload) {
+          const fieldErrors = payload['errors'] as Record<string, string[]>;
+          const firstField = Object.values(fieldErrors)[0];
+          if (Array.isArray(firstField) && firstField.length) {
+            return firstField[0];
+          }
+        }
+      }
+    }
+    return 'We could not parse that pattern. Please try again with more context or a different source.';
+  }
 }

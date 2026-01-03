@@ -46,6 +46,8 @@ MONGODB_URI=mongodb://127.0.0.1:27017/crochet-companion
 JWT_SECRET=replace-with-a-long-random-string
 JWT_EXPIRES_IN=7d
 CLIENT_ORIGIN=http://localhost:4200
+OPENAI_API_KEY=replace-with-your-api-key
+OPENAI_MODEL=gpt-4o-mini
 ```
 
 You can set multiple allowed origins by comma separating them (e.g. `CLIENT_ORIGIN=http://localhost:4200,https://crochet-companion.vercel.app`).
