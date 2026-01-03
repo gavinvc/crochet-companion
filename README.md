@@ -49,6 +49,9 @@ CLIENT_ORIGIN=http://localhost:4200
 
 # Pattern parser LLM (local-first)
 LLM_PROVIDER=ollama           # options: ollama | huggingface
+LLM_GATEWAY_URL=http://localhost:5051
+LLM_GATEWAY_PORT=5051         # only used by the gateway process
+LLM_GATEWAY_TIMEOUT_MS=45000  # optional timeout for gateway -> ollama calls
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2:1b
 
@@ -64,9 +67,11 @@ You can set multiple allowed origins by comma separating them (e.g. `CLIENT_ORIG
 | Script | Purpose |
 | --- | --- |
 | `npm start` | Launch the Express API once (production-style) |
-| `npm run dev` | Run backend (nodemon) and Angular dev server concurrently |
+| `npm run dev` | Run backend, Angular dev server, Ollama daemon, and local LLM gateway concurrently |
 | `npm run dev:server` | Start only the backend with nodemon |
 | `npm run dev:client` | Start only the Angular dev server |
+| `npm run dev:ollama` | Start the local Ollama daemon (normally started automatically by `npm run dev`) |
+| `npm run dev:llm` | Start only the local Ollama gateway (proxy on http://localhost:5051) |
 | `npm run build:client` | Production build of the Angular app |
 | `npm run client:test` | Execute Angular/Vitest unit tests |
 
@@ -95,6 +100,13 @@ Data persists in the named `mongo-data` volume. Stop the container with `docker 
 1. Start MongoDB (Docker or Atlas connection).
 2. Run `npm run dev` to boot both the API (http://localhost:3000) and Angular client (http://localhost:4200).
 3. Use `npm run dev:server` or `npm run dev:client` for focused development on a single side.
+
+### Local LLM gateway
+
+- `npm run dev` also starts a lightweight gateway on http://localhost:5051 that proxies `/v1/chat/completions` requests to your local Ollama instance.
+- Ollama itself is started for you via `npm run dev` (uses `ollama serve`). Ensure the Ollama CLI is installed and the configured model is pulled (`ollama pull llama3.2:1b` by default) the first time you run it.
+- Adjust `LLM_GATEWAY_PORT` or `LLM_GATEWAY_URL` in `.env` if you need a different port or host.
+- Check health at http://localhost:5051/health to confirm the gateway sees the upstream model.
 
 ## Deploying on Vercel
 

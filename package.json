@@ -6,9 +6,11 @@
   "scripts": {
     "start": "node server.js",
     "build": "npm run build:client",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev": "concurrently \"npm run dev:ollama\" \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:llm\"",
     "dev:server": "nodemon server.js",
     "dev:client": "npm --prefix frontend/client run start",
+    "dev:ollama": "OLLAMA_HOST=127.0.0.1 ollama serve",
+    "dev:llm": "nodemon scripts/llm-gateway.js",
     "build:client": "npm --prefix frontend/client run build",
     "client:install": "npm --prefix frontend/client install",
     "test": "echo \"No backend tests configured\" && exit 0",

@@ -1,10 +1,11 @@
 const { z } = require('zod');
 
 const PROVIDER = (process.env.LLM_PROVIDER || 'ollama').toLowerCase();
-// Allow larger patterns before clipping; small local models still handle this size reasonably.
-const MAX_PROMPT_CHARS = 5000;
+// Allow larger patterns before clipping; capped below controller limit (15k).
+const MAX_PROMPT_CHARS = 12000;
 
 // Ollama (free, local-first)
+const LLM_GATEWAY_URL = (process.env.LLM_GATEWAY_URL || 'http://localhost:5051').replace(/\/$/, '');
 const OLLAMA_URL = (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '');
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.2:1b';
 const OLLAMA_REQUEST_TIMEOUT_MS = 40000;
@@ -26,7 +27,7 @@ const rowSchema = z.object({
 }).passthrough();
 
 const llmResponseSchema = z.object({
-  rows: z.array(rowSchema),
+  rows: z.array(rowSchema).optional().default([]),
   summary: z.string().optional().default(''),
   // Some models return objects for warnings; accept anything and clean later.
   warnings: z.array(z.any()).optional().default([])
@@ -49,6 +50,8 @@ const buildPrompt = (text, meta) => {
       'Each row must include rowNumber (int), instruction (plain-language, complete), stitches (array of stitch names), and optional notes.',
       'Do not place warnings inside rows; warnings must go in the top-level warnings array only.',
       'Assume the input may be out of order due to copy/paste; read the entire text and produce a logically ordered, complete pattern.',
+      'Ignore ads, marketing copy, author bio, comments, and any non-pattern sections. Focus only on the crochet pattern instructions and materials.',
+      'If the text contains headers like "Kelli Bias Scarf Pattern", "Part", or "Row", treat those as the start of the instructions and prioritize everything from there onward.',
       'Each row must include the full start, middle, repeat-until-end behavior, and end-of-row action (e.g., turn/join/continue). Do not stop mid-row; include how the row ends.',
       'Expand shorthand or implied repeats into explicit instructions, including inferred repeat counts or "repeat to end" when language implies repetition (e.g., "* pattern * across", "repeat Row 2"), and state the end-of-row action. Do not leave rows hanging at "until last X sts"—finish the row explicitly.',
       'If any detail is missing, make a best-effort, concise guess for the complete row and record the assumption in warnings.',
@@ -99,7 +102,8 @@ const callOllamaChat = async ({ system, user }) => {
   const timer = setTimeout(() => controller.abort(), OLLAMA_REQUEST_TIMEOUT_MS);
 
   try {
-    const url = `${OLLAMA_URL}/v1/chat/completions`;
+    const baseUrl = LLM_GATEWAY_URL || OLLAMA_URL;
+    const url = `${baseUrl}/v1/chat/completions`;
     const body = {
       model: OLLAMA_MODEL,
       messages: [
@@ -540,6 +544,9 @@ const parsePatternWithLLM = async ({ text, meta }) => {
   const parsedJson = llmResponseSchema.parse(parsedRoot);
   const rows = normalizeRows(parsedJson.rows);
   const warnings = normalizeWarnings(parsedJson.warnings);
+  if (rows.length === 0) {
+    warnings.push('LLM response contained no rows; please retry or ensure the model has the correct prompt context.');
+  }
   if (wasClipped) {
     warnings.push(`Input truncated to ${MAX_PROMPT_CHARS} characters; output may be partial.`);
   }
