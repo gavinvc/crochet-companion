@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <article class="share-card" *ngIf="auth.isLoggedIn(); else shareSignIn">
+    <article class="share-card" id="share-form" *ngIf="auth.isLoggedIn(); else shareSignIn">
       <p class="card-label">Share a pattern</p>
       <form [formGroup]="shareForm" (ngSubmit)="sharePattern()" novalidate>
         <label>
@@ -42,7 +42,7 @@
 
         <label>
           <span>Rows (one per line)</span>
-          <textarea formControlName="rowsInput" rows="5" placeholder="Row 1: ...&#10;Row 2: ..."></textarea>
+          <textarea formControlName="rowsInput" rows="5" placeholder="Row 1: ...&#10;Rows 3-5: repeat step..."></textarea>
         </label>
 
         <button type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Saving...' : 'Publish pattern' }}</button>
@@ -54,6 +54,66 @@
         <p class="lede">Create an account to publish patterns with images and rows.</p>
         <a routerLink="/auth" class="cta">Go to sign in</a>
       </article>
+    </ng-template>
+  </section>
+
+  <section class="maker-section" *ngIf="auth.isLoggedIn()">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Maker space</p>
+        <h2>Your patterns</h2>
+        <p class="lede muted">Quick access to what you published.</p>
+      </div>
+      <a class="cta ghost" href="#share-form">Create pattern</a>
+    </header>
+
+    <div class="maker-grid" *ngIf="myPatterns().length; else emptyMine">
+      <article class="maker-card" *ngFor="let pattern of myPatterns()">
+        <div class="maker-card__head">
+          <h3>{{ pattern.title }}</h3>
+          <span class="pill">{{ rowsPreview(pattern) }}</span>
+        </div>
+        <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
+        <div class="maker-card__actions">
+          <button type="button" (click)="openPattern(pattern)">Open</button>
+          <button type="button" class="ghost" (click)="toggleFollow(pattern)">
+            {{ pattern.isFollowing ? 'Unfollow' : 'Follow' }}
+          </button>
+          <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+        </div>
+      </article>
+    </div>
+    <ng-template #emptyMine>
+      <p class="empty">You have not published any patterns yet.</p>
+    </ng-template>
+  </section>
+
+  <section class="maker-section" *ngIf="auth.isLoggedIn()">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Maker space</p>
+        <h2>Followed patterns</h2>
+        <p class="lede muted">Stay close to what inspires you.</p>
+      </div>
+    </header>
+
+    <div class="maker-grid" *ngIf="followedPatterns().length; else emptyFollowing">
+      <article class="maker-card" *ngFor="let pattern of followedPatterns()">
+        <div class="maker-card__head">
+          <h3>{{ pattern.title }}</h3>
+          <span class="pill">{{ rowsPreview(pattern) }}</span>
+        </div>
+        <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
+        <div class="maker-card__actions">
+          <button type="button" (click)="openPattern(pattern)">Open</button>
+          <button type="button" class="ghost" (click)="toggleFollow(pattern)">
+            Unfollow
+          </button>
+        </div>
+      </article>
+    </div>
+    <ng-template #emptyFollowing>
+      <p class="empty">You are not following any patterns yet.</p>
     </ng-template>
   </section>
 

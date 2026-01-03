@@ -3,6 +3,7 @@ export interface PatternRow {
   instruction: string;
   stitches?: string[];
   notes?: string;
+  rowSpan?: number;
 }
 
 export interface PatternAuthor {
@@ -21,6 +22,7 @@ export interface PatternSummary {
   rowCount: number;
   author: PatternAuthor;
   isFollowing?: boolean;
+  isOwner?: boolean;
   createdAt: string;
 }
 

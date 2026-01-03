@@ -21,6 +21,8 @@ export class PatternsPage {
   protected readonly auth = inject(AuthService);
 
   protected readonly patterns = signal<PatternSummary[]>([]);
+  protected readonly myPatterns = signal<PatternSummary[]>([]);
+  protected readonly followedPatterns = signal<PatternSummary[]>([]);
   protected readonly isLoading = signal(false);
   protected readonly isSubmitting = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -34,6 +36,8 @@ export class PatternsPage {
 
   constructor() {
     this.loadPatterns();
+    this.loadMyPatterns();
+    this.loadFollowedPatterns();
   }
 
   private loadPatterns(): void {
@@ -44,6 +48,28 @@ export class PatternsPage {
       next: ({ patterns }) => this.patterns.set(patterns),
       error: () => this.error.set('Could not load patterns right now.'),
       complete: () => this.isLoading.set(false)
+    });
+  }
+
+  private loadMyPatterns(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.myPatterns.set([]);
+      return;
+    }
+    this.patternsSvc.listMine().subscribe({
+      next: ({ patterns }) => this.myPatterns.set(patterns),
+      error: () => this.myPatterns.set([])
+    });
+  }
+
+  private loadFollowedPatterns(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.followedPatterns.set([]);
+      return;
+    }
+    this.patternsSvc.listFollowing().subscribe({
+      next: ({ patterns }) => this.followedPatterns.set(patterns),
+      error: () => this.followedPatterns.set([])
     });
   }
 
@@ -102,8 +128,37 @@ export class PatternsPage {
               : item
           )
         );
+        this.myPatterns.update(list =>
+          list.map(item => (item.id === pattern.id ? { ...item, isFollowing, followerCount } : item))
+        );
+        this.followedPatterns.update(list => {
+          const exists = list.some(item => item.id === pattern.id);
+          if (isFollowing && !exists) {
+            const found = this.patterns().find(p => p.id === pattern.id) || pattern;
+            return [{ ...found, isFollowing, followerCount }, ...list];
+          }
+          if (!isFollowing) {
+            return list.filter(item => item.id !== pattern.id);
+          }
+          return list.map(item => (item.id === pattern.id ? { ...item, isFollowing, followerCount } : item));
+        });
       },
       error: () => this.error.set('Unable to update follow state right now.')
+    });
+  }
+
+  protected deletePattern(pattern: PatternSummary): void {
+    if (!pattern.isOwner) return;
+    const confirmed = window.confirm('Delete this pattern? This cannot be undone.');
+    if (!confirmed) return;
+
+    this.patternsSvc.delete(pattern.id).subscribe({
+      next: () => {
+        this.patterns.update(list => list.filter(item => item.id !== pattern.id));
+        this.myPatterns.update(list => list.filter(item => item.id !== pattern.id));
+        this.followedPatterns.update(list => list.filter(item => item.id !== pattern.id));
+      },
+      error: () => this.error.set('Could not delete this pattern right now.')
     });
   }
 
@@ -120,10 +175,31 @@ export class PatternsPage {
   }
 
   private parseRows(input: string): PatternRow[] {
-    return input
+    const lines = input
       .split(/\r?\n/)
       .map(line => line.trim())
-      .filter(line => line.length > 0)
-      .map((instruction, index) => ({ rowNumber: index + 1, instruction }));
+      .filter(line => line.length > 0);
+
+    const rows: PatternRow[] = [];
+    let nextRowNumber = 1;
+    const labelRegex = /^(?:rows?|rounds?)\s+(\d+)(?:\s*[-–]\s*(\d+))?\s*[:.-]?\s*(.*)$/i;
+
+    for (const line of lines) {
+      const match = labelRegex.exec(line);
+      if (match) {
+        const start = parseInt(match[1], 10);
+        const end = match[2] ? parseInt(match[2], 10) : start;
+        const instruction = (match[3] || '').trim();
+        const rowSpan = Math.max(1, end - start + 1);
+        rows.push({ rowNumber: start, rowSpan, instruction: instruction || line });
+        nextRowNumber = end + 1;
+        continue;
+      }
+
+      rows.push({ rowNumber: nextRowNumber, instruction: line });
+      nextRowNumber += 1;
+    }
+
+    return rows;
   }
 }

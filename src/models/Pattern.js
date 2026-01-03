@@ -5,7 +5,8 @@ const rowSchema = new mongoose.Schema(
     rowNumber: { type: Number, default: 0 },
     instruction: { type: String, required: true, trim: true },
     stitches: { type: [String], default: [] },
-    notes: { type: String, default: '' }
+    notes: { type: String, default: '' },
+    rowSpan: { type: Number, default: 1, min: 1 }
   },
   { _id: false }
 );

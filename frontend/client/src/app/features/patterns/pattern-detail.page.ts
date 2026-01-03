@@ -1,8 +1,18 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PatternDetail } from '../../core/models/pattern.model';
+
+type ExpandedRow = {
+  displayNumber: number;
+  instruction: string;
+  stitches?: string[];
+  notes?: string;
+  sourceRowNumber: number;
+  spanSize: number;
+  spanIndex: number;
+};
 import { PatternService } from '../../core/services/pattern.service';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -15,6 +25,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class PatternDetailPage {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly patterns = inject(PatternService);
   protected readonly auth = inject(AuthService);
 
@@ -23,8 +34,29 @@ export class PatternDetailPage {
   protected readonly pattern = signal<PatternDetail | null>(null);
   protected readonly activeRowIndex = signal(0);
 
-  protected readonly rows = computed(() => this.pattern()?.rows ?? []);
-  protected readonly activeRow = computed(() => this.rows()[this.activeRowIndex()] ?? null);
+  protected readonly expandedRows = computed<ExpandedRow[]>(() => {
+    const current = this.pattern();
+    if (!current) return [];
+
+    const expanded: ExpandedRow[] = [];
+    for (const row of current.rows) {
+      const start = row.rowNumber ?? 1;
+      const span = Math.max(1, row.rowSpan ?? 1);
+      for (let i = 0; i < span; i++) {
+        expanded.push({
+          displayNumber: start + i,
+          instruction: row.instruction,
+          stitches: row.stitches,
+          notes: row.notes,
+          sourceRowNumber: start,
+          spanSize: span,
+          spanIndex: i
+        });
+      }
+    }
+    return expanded;
+  });
+  protected readonly activeRow = computed(() => this.expandedRows()[this.activeRowIndex()] ?? null);
 
   constructor() {
     const patternId = this.route.snapshot.paramMap.get('patternId');
@@ -68,7 +100,7 @@ export class PatternDetailPage {
   }
 
   protected selectRow(index: number): void {
-    if (index < 0 || index >= this.rows().length) return;
+    if (index < 0 || index >= this.expandedRows().length) return;
     this.activeRowIndex.set(index);
   }
 
@@ -78,5 +110,19 @@ export class PatternDetailPage {
 
   protected nextRow(): void {
     this.selectRow(this.activeRowIndex() + 1);
+  }
+
+  protected deletePattern(): void {
+    const current = this.pattern();
+    if (!current || !current.isOwner) return;
+    const confirmed = window.confirm('Delete this pattern? This cannot be undone.');
+    if (!confirmed) return;
+
+    this.patterns.delete(current.id).subscribe({
+      next: () => {
+        this.router.navigate(['/patterns']);
+      },
+      error: () => this.error.set('Could not delete this pattern right now.')
+    });
   }
 }

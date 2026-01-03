@@ -15,6 +15,14 @@ export class PatternService {
     return this.http.get<{ patterns: PatternSummary[] }>(this.baseUrl);
   }
 
+  listMine(): Observable<{ patterns: PatternSummary[] }> {
+    return this.http.get<{ patterns: PatternSummary[] }>(`${this.baseUrl}?scope=mine`);
+  }
+
+  listFollowing(): Observable<{ patterns: PatternSummary[] }> {
+    return this.http.get<{ patterns: PatternSummary[] }>(`${this.baseUrl}?scope=following`);
+  }
+
   get(patternId: string): Observable<{ pattern: PatternDetail }> {
     return this.http.get<{ pattern: PatternDetail }>(`${this.baseUrl}/${patternId}`);
   }
@@ -28,5 +36,9 @@ export class PatternService {
       `${this.baseUrl}/${patternId}/follow`,
       {}
     );
+  }
+
+  delete(patternId: string): Observable<{ success: boolean; patternId: string }> {
+    return this.http.delete<{ success: boolean; patternId: string }>(`${this.baseUrl}/${patternId}`);
   }
 }

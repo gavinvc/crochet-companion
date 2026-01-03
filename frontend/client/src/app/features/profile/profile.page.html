@@ -1,37 +1,94 @@
-<section class="profile-hero">
-  <div>
-    <p class="eyebrow">Maker space · Coming soon</p>
-    <h1>{{ title }}</h1>
-    <p class="lede">{{ subtitle }}</p>
-    <div class="hero-actions">
-      <a routerLink="/parser" class="primary">Open Pattern Parser</a>
-      <a routerLink="/community" class="ghost" aria-disabled="true">Community access coming soon</a>
+<div class="profile-page">
+  <section class="profile-hero">
+    <div>
+      <p class="eyebrow">{{ isPersonalSpace ? 'Maker space' : 'Maker profile' }}</p>
+      <h1>{{ title }}</h1>
+      <p class="lede">{{ subtitle }}</p>
+      <div class="hero-actions">
+        <a routerLink="/patterns" class="primary">Browse patterns</a>
+        <a routerLink="/parser" class="ghost">Open Pattern Parser</a>
+      </div>
+      <p *ngIf="error()" class="error">{{ error() }}</p>
     </div>
-  </div>
-  <div class="profile-card" *ngIf="isPersonalSpace">
-    <p>Quick pulse</p>
-    <h3>Coming soon</h3>
-    <p>Personal stats will appear here after launch.</p>
-  </div>
-  <div class="profile-card" *ngIf="!isPersonalSpace">
-    <p>Follow this maker</p>
-    <p>Following activity will unlock when community profiles go live.</p>
-  </div>
-</section>
+    <div class="profile-card" *ngIf="isPersonalSpace">
+      <p class="card-label">Quick pulse</p>
+      <h3>{{ myPatterns().length }} published</h3>
+      <p>{{ followedPatterns().length }} followed</p>
+      <a routerLink="/patterns" class="inline-link">Manage patterns</a>
+    </div>
+    <div class="profile-card" *ngIf="!isPersonalSpace">
+      <p>Follow this maker</p>
+      <p>Following activity will unlock when community profiles go live.</p>
+    </div>
+  </section>
 
-<section class="panels">
-  <article *ngFor="let panel of panels">
-    <h3>{{ panel.title }}</h3>
-    <p>{{ panel.description }}</p>
-    <button type="button" disabled>{{ panel.cta }}</button>
-  </article>
-</section>
+  <section class="maker-section" *ngIf="isPersonalSpace">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Maker space</p>
+        <h2>Your patterns</h2>
+        <p class="lede muted">Tap to jump straight into playback.</p>
+      </div>
+    </header>
+    <div *ngIf="isLoading()" class="loading">Loading your patterns...</div>
+    <div class="maker-grid" *ngIf="!isLoading() && myPatterns().length; else emptyMine">
+      <article class="maker-card" *ngFor="let pattern of myPatterns()">
+        <div class="maker-card__head">
+          <h3>{{ pattern.title }}</h3>
+          <span class="pill">{{ rowsPreview(pattern) }}</span>
+        </div>
+        <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
+        <div class="maker-card__actions">
+          <a [routerLink]="['/patterns', pattern.id]" class="inline-link">Open</a>
+          <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+        </div>
+      </article>
+    </div>
+    <ng-template #emptyMine>
+      <p class="empty">You have not published any patterns yet.</p>
+    </ng-template>
+  </section>
 
-<section class="quick-actions">
-  <article *ngFor="let action of actions">
-    <h4>{{ action.label }}</h4>
-    <p>{{ action.description }}</p>
-  </article>
-</section>
+  <section class="maker-section" *ngIf="isPersonalSpace">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Maker space</p>
+        <h2>Followed patterns</h2>
+        <p class="lede muted">Saved patterns you are following.</p>
+      </div>
+    </header>
+    <div class="maker-grid" *ngIf="followedPatterns().length; else emptyFollowing">
+      <article class="maker-card" *ngFor="let pattern of followedPatterns()">
+        <div class="maker-card__head">
+          <h3>{{ pattern.title }}</h3>
+          <span class="pill">{{ rowsPreview(pattern) }}</span>
+        </div>
+        <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
+        <div class="maker-card__actions">
+          <a [routerLink]="['/patterns', pattern.id]" class="inline-link">Open</a>
+          <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+        </div>
+      </article>
+    </div>
+    <ng-template #emptyFollowing>
+      <p class="empty">You are not following any patterns yet.</p>
+    </ng-template>
+  </section>
 
-<p class="fine-print">Profiles and maker spaces are still in development—features on this page are placeholders.</p>
+  <section class="panels">
+    <article *ngFor="let panel of panels">
+      <h3>{{ panel.title }}</h3>
+      <p>{{ panel.description }}</p>
+      <button type="button" disabled>{{ panel.cta }}</button>
+    </article>
+  </section>
+
+  <section class="quick-actions">
+    <article *ngFor="let action of actions">
+      <h4>{{ action.label }}</h4>
+      <p>{{ action.description }}</p>
+    </article>
+  </section>
+
+  <p class="fine-print">Maker dashboards are still in development; more insights will land here soon.</p>
+</div>

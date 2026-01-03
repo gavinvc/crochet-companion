@@ -1,48 +1,57 @@
-<section class="pattern-hero" *ngIf="pattern() as p">
-  <div class="cover" [style.backgroundImage]="p.imageUrl ? 'url(' + p.imageUrl + ')' : ''"></div>
-  <div class="hero-copy">
-    <p class="eyebrow">Shared pattern</p>
-    <h1>{{ p.title }}</h1>
-    <p class="lede">{{ p.description || 'No description provided.' }}</p>
-    <div class="meta">
-      <span>By {{ p.author.handle }}</span>
-      <span>Followers: {{ p.followerCount }}</span>
-      <span>Rows: {{ p.rowCount }}</span>
+<div class="pattern-page">
+  <section class="pattern-hero" *ngIf="pattern() as p">
+    <div class="cover" [style.backgroundImage]="p.imageUrl ? 'url(' + p.imageUrl + ')' : ''"></div>
+    <div class="hero-copy">
+      <p class="eyebrow">Shared pattern</p>
+      <h1>{{ p.title }}</h1>
+      <p class="lede">{{ p.description || 'No description provided.' }}</p>
+      <div class="meta">
+        <span>By {{ p.author.handle }}</span>
+        <span>Followers: {{ p.followerCount }}</span>
+        <span>Rows: {{ p.rowCount }}</span>
+      </div>
+      <div class="hero-actions">
+        <button type="button" (click)="toggleFollow()">{{ p.isFollowing ? 'Unfollow' : 'Follow' }}</button>
+        <button type="button" class="danger" *ngIf="p.isOwner" (click)="deletePattern()">Delete</button>
+        <a routerLink="/patterns">Back to patterns</a>
+      </div>
+      <p *ngIf="error()" class="error">{{ error() }}</p>
     </div>
-    <div class="hero-actions">
-      <button type="button" (click)="toggleFollow()">{{ p.isFollowing ? 'Unfollow' : 'Follow' }}</button>
-      <a routerLink="/patterns">Back to patterns</a>
-    </div>
-    <p *ngIf="error()" class="error">{{ error() }}</p>
-  </div>
-</section>
+  </section>
 
-<section class="pattern-viewer" *ngIf="pattern() as p">
-  <div class="row-list">
-    <button
-      type="button"
-      *ngFor="let row of rows(); let i = index"
-      [class.active]="i === activeRowIndex()"
-      (click)="selectRow(i)"
-    >
-      <span>Row {{ row.rowNumber }}</span>
-      <p>{{ row.instruction }}</p>
-    </button>
-  </div>
-
-  <div class="row-detail" *ngIf="activeRow() as row">
-    <p class="eyebrow">Row {{ row.rowNumber }}</p>
-    <p class="instruction">{{ row.instruction }}</p>
-    <p *ngIf="row.notes" class="notes">{{ row.notes }}</p>
-    <div class="chips" *ngIf="row.stitches?.length">
-      <span *ngFor="let stitch of row.stitches">{{ stitch }}</span>
+  <section class="pattern-viewer" *ngIf="pattern()">
+    <div class="row-list">
+      <button
+        type="button"
+        *ngFor="let row of expandedRows(); let i = index"
+        [class.active]="i === activeRowIndex()"
+        (click)="selectRow(i)"
+      >
+        <span>Row {{ row.displayNumber }}</span>
+        <p>{{ row.instruction }}</p>
+        <small class="span-note" *ngIf="row.spanSize > 1 && row.spanIndex === 0">
+          Rows {{ row.sourceRowNumber }}-{{ row.sourceRowNumber + row.spanSize - 1 }}
+        </small>
+      </button>
     </div>
-    <div class="row-nav">
-      <button type="button" (click)="prevRow()" [disabled]="activeRowIndex() === 0">Previous</button>
-      <button type="button" (click)="nextRow()" [disabled]="activeRowIndex() >= rows().length - 1">Next</button>
-    </div>
-  </div>
-</section>
 
-<div *ngIf="isLoading()" class="loading">Loading pattern...</div>
-<div *ngIf="!pattern() && !isLoading() && error()" class="error">{{ error() }}</div>
+    <div class="row-detail" *ngIf="activeRow() as row">
+      <p class="eyebrow">Row {{ row.displayNumber }}</p>
+      <p class="instruction">{{ row.instruction }}</p>
+      <p *ngIf="row.notes" class="notes">{{ row.notes }}</p>
+      <div class="chips" *ngIf="row.stitches?.length">
+        <span *ngFor="let stitch of row.stitches">{{ stitch }}</span>
+      </div>
+      <p class="span-note" *ngIf="row.spanSize > 1">
+        Same instructions through Row {{ row.sourceRowNumber + row.spanSize - 1 }}
+      </p>
+      <div class="row-nav">
+        <button type="button" (click)="prevRow()" [disabled]="activeRowIndex() === 0">Previous</button>
+        <button type="button" (click)="nextRow()" [disabled]="activeRowIndex() >= expandedRows().length - 1">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="isLoading()" class="loading">Loading pattern...</div>
+  <div *ngIf="!pattern() && !isLoading() && error()" class="error">{{ error() }}</div>
+</div>
