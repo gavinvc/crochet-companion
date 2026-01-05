@@ -1,44 +1,67 @@
 # Crochet Companion
 
-A single Git repository that hosts the MongoDB + Express backend and Angular client for the Crochet Companion app. The project root (`crochet-companion/`) is the only Git repository; everything underneath (including `frontend/client`) is tracked from here so you never end up with nested repos.
+Full-stack MongoDB + Express API with an Angular client for sharing, parsing, and walking through crochet patterns. This repo is a single Git project; the Angular app under `frontend/client` is tracked from the root (no nested repos).
+
+## Features
+
+- Pattern sharing with row-by-row playback, images, follow/unfollow, and delete (owner only).
+- Sample patterns (authored by `gavinvc`) baked into the client so the Patterns page always has demo content alongside API data.
+- Community page placeholders for upcoming critiques, maker bridges, and groups (posts/chat coming soon).
+- Maker space views for “my patterns” and “followed patterns”.
+- Pattern Parser (LLM-assisted) with a local-first Ollama gateway and optional Hugging Face fallback.
 
 ## Project layout
 
 ```text
 crochet-companion/
-├── server.js            # Express + Mongoose API
-├── package.json         # Backend dependencies & orchestration scripts
-├── frontend/client/     # Angular 17+ application
-├── crochet-env/         # (Optional) local Python helpers, ignored by Git
-└── .gitignore           # Covers backend + frontend artifacts
+├── server.js              # Express bootstrap
+├── api/                   # Vercel-style entrypoint (re-exports Express app)
+├── src/                   # API code (controllers, models, routes, services)
+├── frontend/client/       # Angular 17+ app
+├── docker-compose.yml     # Optional MongoDB service
+├── vercel.json            # Vercel routing/output config
+└── crochet-env/           # Optional Python venv (ignored by Git)
 ```
 
 ## Prerequisites
 
 - Node.js 20+ and npm 10+
-- MongoDB running locally or a MongoDB Atlas cluster
-- Docker (optional, for the one-command MongoDB service)
-- (Optional) Python 3.14 virtual env inside `crochet-env/`
+- MongoDB 7+ (local Docker or Atlas)
+- (Optional) Docker for one-command Mongo
+- (Optional) Ollama CLI for local LLM parsing
 
-## Installation
+## Quick start (local)
 
-1. Clone the repo and move into it:
-   ```bash
-   git clone <your-remote-url> crochet-companion
-   cd crochet-companion
-   ```
-2. Install backend tooling:
-   ```bash
-   npm install
-   ```
-3. Install Angular client dependencies from the repo root:
-   ```bash
-   npm run client:install
-   ```
+1) Install deps from the repo root:
+```bash
+npm install
+npm run client:install
+```
+
+2) Configure `.env` (see below). Minimal local example:
+```
+PORT=3000
+MONGODB_URI=mongodb://127.0.0.1:27017/crochet-companion
+JWT_SECRET=replace-with-a-long-random-string
+JWT_EXPIRES_IN=7d
+CLIENT_ORIGIN=http://localhost:4200
+LLM_PROVIDER=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2:1b
+LLM_GATEWAY_URL=http://localhost:5051
+```
+
+3) Run everything (API + Angular + Ollama gateway):
+```bash
+npm run dev
+```
+- API: http://localhost:3000
+- Angular: http://localhost:4200
+- LLM gateway: http://localhost:5051
+
+For focused work: `npm run dev:server` (API only) or `npm run dev:client` (Angular only).
 
 ## Environment variables
-
-Create a `.env` file (Git-ignored) or export the variables before running the server:
 
 ```
 PORT=3000
@@ -47,85 +70,72 @@ JWT_SECRET=replace-with-a-long-random-string
 JWT_EXPIRES_IN=7d
 CLIENT_ORIGIN=http://localhost:4200
 
-# Pattern parser LLM (local-first)
-LLM_PROVIDER=ollama           # options: ollama | huggingface
+# LLM (local-first)
+LLM_PROVIDER=ollama             # ollama | huggingface
 LLM_GATEWAY_URL=http://localhost:5051
-LLM_GATEWAY_PORT=5051         # only used by the gateway process
-LLM_GATEWAY_TIMEOUT_MS=45000  # optional timeout for gateway -> ollama calls
+LLM_GATEWAY_PORT=5051
+LLM_GATEWAY_TIMEOUT_MS=45000
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2:1b
 
-# Optional remote fallback (only if LLM_PROVIDER=huggingface)
+# Optional Hugging Face fallback (if LLM_PROVIDER=huggingface)
 HF_TOKEN=<your-hf-token>
 HF_MODEL=meta-llama/Llama-3.2-1B-Instruct
 ```
 
-You can set multiple allowed origins by comma separating them (e.g. `CLIENT_ORIGIN=http://localhost:4200,https://crochet-companion.vercel.app`).
+Multiple client origins are allowed by comma separating `CLIENT_ORIGIN`.
 
-## NPM scripts (run from the repo root)
+## Scripts (run from repo root)
 
-| Script | Purpose |
+| Script | What it does |
 | --- | --- |
-| `npm start` | Launch the Express API once (production-style) |
-| `npm run dev` | Run backend, Angular dev server, Ollama daemon, and local LLM gateway concurrently |
-| `npm run dev:server` | Start only the backend with nodemon |
-| `npm run dev:client` | Start only the Angular dev server |
-| `npm run dev:ollama` | Start the local Ollama daemon (normally started automatically by `npm run dev`) |
-| `npm run dev:llm` | Start only the local Ollama gateway (proxy on http://localhost:5051) |
-| `npm run build:client` | Production build of the Angular app |
-| `npm run client:test` | Execute Angular/Vitest unit tests |
+| `npm start` | Start Express once (prod-style) |
+| `npm run dev` | Run API, Angular dev server, Ollama daemon, LLM gateway concurrently |
+| `npm run dev:server` | API only (nodemon) |
+| `npm run dev:client` | Angular dev server only |
+| `npm run dev:ollama` | Start Ollama daemon (normally started by `dev`) |
+| `npm run dev:llm` | LLM gateway only (http://localhost:5051) |
+| `npm run build:client` | Production Angular build |
+| `npm run client:test` | Angular/Vitest tests |
 
-## Quick MongoDB setup
+## MongoDB options
 
-### Option A – Docker (local development)
-
-Use the provided `docker-compose.yml` to run MongoDB 7 locally:
-
+**Docker (local):**
 ```bash
 docker compose up -d mongodb
-# connection string: mongodb://127.0.0.1:27017/crochet-companion
+# DSN: mongodb://127.0.0.1:27017/crochet-companion
 ```
 
-Data persists in the named `mongo-data` volume. Stop the container with `docker compose down`.
+**Atlas (cloud):** create a cluster, allow the needed IPs, and set `MONGODB_URI` to your SRV connection string.
 
-### Option B – MongoDB Atlas (cloud)
+## Frontend notes (Angular)
 
-1. Create a free Atlas project and a database user.
-2. Allow the Vercel IP ranges or `0.0.0.0/0` while developing.
-3. Copy the SRV connection string, replace `<password>` with your user password, and set it as `MONGODB_URI`.
-4. (Optional) Add `retryWrites=true&w=majority` for better fault tolerance.
+- Patterns page merges live API data with client-side sample patterns authored by `gavinvc`, so the grid never appears empty.
+- Sample images:
+  - Granny Square Coaster: https://www.craftpassion.com/wp-content/uploads/crochet-solid-granny-square-coaster-720x405.jpg
+  - Textured Mug Rug: https://kickincrochet.com/wp-content/uploads/2022/07/IMG_20220612_073801625_BURST000_COVER_TOPms.jpg
+  - Chunky Ribbed Beanie: https://www.crochet365knittoo.com/wp-content/uploads/2019/12/Ribbed-Wonder-Hat-to-the-side.jpg
+- Community page currently shows program stubs, maker bridges, and groups (posts/chat “coming soon”).
+- Maker space surfaces your published and followed patterns; delete is owner-only.
 
-## Running the stack locally
+## LLM parser (local-first)
 
-1. Start MongoDB (Docker or Atlas connection).
-2. Run `npm run dev` to boot both the API (http://localhost:3000) and Angular client (http://localhost:4200).
-3. Use `npm run dev:server` or `npm run dev:client` for focused development on a single side.
-
-### Local LLM gateway
-
-- `npm run dev` also starts a lightweight gateway on http://localhost:5051 that proxies `/v1/chat/completions` requests to your local Ollama instance.
-- Ollama itself is started for you via `npm run dev` (uses `ollama serve`). Ensure the Ollama CLI is installed and the configured model is pulled (`ollama pull llama3.2:1b` by default) the first time you run it.
-- Adjust `LLM_GATEWAY_PORT` or `LLM_GATEWAY_URL` in `.env` if you need a different port or host.
-- Check health at http://localhost:5051/health to confirm the gateway sees the upstream model.
+- The gateway (http://localhost:5051) proxies `/v1/chat/completions` to Ollama.
+- Default model: `llama3.2:1b`. Pull it once with `ollama pull llama3.2:1b` if not present.
+- Switch to Hugging Face by setting `LLM_PROVIDER=huggingface` and providing `HF_TOKEN`/`HF_MODEL`.
 
 ## Deploying on Vercel
 
-The repository is configured so a single Vercel project can host both the Angular static build and the Express API as a serverless function.
-
-1. **Create project:** `vercel init` (or import the GitHub repo) and choose "Other".
-2. **Environment variables:** add `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, and `CLIENT_ORIGIN` (set to your Vercel domain, e.g. `https://crochet-companion.vercel.app`).
-3. **Build command:** default `npm run build` (already mapped to the Angular build).
-4. **Output directory:** `frontend/client/dist/client/browser` (defined in `vercel.json`).
-5. **API routes:** requests to `/api/*` are forwarded to `api/index.js`, which boots the same Express app used locally and reuses the MongoDB connection.
-6. **Local parity:** run `vercel dev` to simulate the Vercel platform, including the serverless API and Angular build output.
-
-> **Note:** Make sure your MongoDB cluster allows connections from Vercel. Atlas makes this easy through the Network Access tab.
+1. Add env vars: `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLIENT_ORIGIN` (use your Vercel URL), and any LLM vars.
+2. Build command: `npm run build` (uses Angular build).
+3. Output dir: `frontend/client/dist/client/browser` (matches `vercel.json`).
+4. API: `/api/*` routes forward to `api/index.js`, which boots the Express app.
+5. Local parity: `vercel dev` simulates both the API and the built Angular output.
 
 ## Working with Git
 
-- All commits happen from the repository root (`crochet-companion/`).
-- Do **not** initialize another Git repository inside `frontend/client`—that directory is already tracked by the root repo.
-- Use feature branches: `git checkout -b feature/add-patterns`, make changes, `git add .`, `git commit`, then push.
-- The included `.gitignore` keeps `node_modules`, `dist`, Angular cache folders, and the local Python environment out of Git history.
+- Work from the repo root; do **not** init Git inside `frontend/client`.
+- Use feature branches, then `git add .` / `git commit` / push.
+- `.gitignore` covers backend + frontend artifacts (node_modules, dist, cache, local envs).
 
 Happy crocheting and coding!
