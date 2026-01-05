@@ -3,6 +3,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PatternDetail } from '../../core/models/pattern.model';
+import { isSamplePatternId } from '../../core/data/sample-patterns';
 
 type ExpandedRow = {
   displayNumber: number;
@@ -86,7 +87,8 @@ export class PatternDetailPage {
   protected toggleFollow(): void {
     const current = this.pattern();
     if (!current) return;
-    if (!this.auth.isLoggedIn()) {
+    const isSample = isSamplePatternId(current.id);
+    if (!this.auth.isLoggedIn() && !isSample) {
       this.error.set('Sign in to follow patterns.');
       return;
     }

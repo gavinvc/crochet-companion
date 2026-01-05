@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { PatternService } from '../../core/services/pattern.service';
 import { PatternSummary, PatternRow } from '../../core/models/pattern.model';
+import { getSampleSummaries, isSamplePatternId } from '../../core/data/sample-patterns';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -19,6 +20,8 @@ export class PatternsPage {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   protected readonly auth = inject(AuthService);
+
+  protected readonly samplePatterns = getSampleSummaries();
 
   protected readonly patterns = signal<PatternSummary[]>([]);
   protected readonly myPatterns = signal<PatternSummary[]>([]);
@@ -45,7 +48,7 @@ export class PatternsPage {
     this.error.set(null);
 
     this.patternsSvc.list().subscribe({
-      next: ({ patterns }) => this.patterns.set(patterns),
+      next: ({ patterns }) => this.patterns.set(this.mergeWithSamples(patterns)),
       error: () => this.error.set('Could not load patterns right now.'),
       complete: () => this.isLoading.set(false)
     });
@@ -114,7 +117,8 @@ export class PatternsPage {
   }
 
   protected toggleFollow(pattern: PatternSummary): void {
-    if (!this.auth.isLoggedIn()) {
+    const isSample = isSamplePatternId(pattern.id);
+    if (!this.auth.isLoggedIn() && !isSample) {
       this.error.set('Sign in to follow patterns.');
       return;
     }
@@ -167,11 +171,23 @@ export class PatternsPage {
   }
 
   protected openPattern(pattern: PatternSummary): void {
-    if (!this.auth.isLoggedIn()) {
+    const isSample = isSamplePatternId(pattern.id);
+    if (!this.auth.isLoggedIn() && !isSample) {
       this.error.set('Sign in to view patterns.');
       return;
     }
     this.router.navigate(['/patterns', pattern.id]);
+  }
+
+  private mergeWithSamples(fetched: PatternSummary[]): PatternSummary[] {
+    const merged = [...this.samplePatterns, ...fetched];
+    const map = new Map<string, PatternSummary>();
+    for (const item of merged) {
+      if (!map.has(item.id)) {
+        map.set(item.id, item);
+      }
+    }
+    return Array.from(map.values());
   }
 
   private parseRows(input: string): PatternRow[] {

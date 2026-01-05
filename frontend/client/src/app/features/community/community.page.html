@@ -1,28 +1,74 @@
-<section class="community-hero">
-  <div class="community-hero__copy">
-    <p class="eyebrow">Community</p>
-    <h1>Community gatherings coming soon.</h1>
-    <p class="lede">
-      We are designing critique tables, async studio notes, and focus circles now. Join the waitlist and be the
-      first to know when these spaces open.
-    </p>
-    <a routerLink="/auth" class="cta" aria-disabled="true">Join the waitlist</a>
-  </div>
-  <div class="spotlights">
-    <article *ngFor="let spotlight of spotlights">
-      <h3>{{ spotlight.name }}</h3>
-      <p class="project">{{ spotlight.project }}</p>
-      <p>{{ spotlight.detail }}</p>
-    </article>
-  </div>
-</section>
+<div class="community-page">
+  <section class="community-hero">
+    <div class="community-hero__copy">
+      <p class="eyebrow">Community</p>
+      <h1>Community gatherings are opening in waves.</h1>
+      <p class="lede">
+        We are pairing maker spaces with critique tables, async studio notes, and slow-make circles. Community features
+        are still opening in waves.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/auth" class="cta primary">Join the waitlist</a>
+        <a routerLink="/patterns" class="cta ghost">Browse patterns</a>
+      </div>
+      <div class="hero-bullets">
+        <span class="pill" *ngFor="let point of heroBullets">{{ point }}</span>
+      </div>
+    </div>
 
-<section class="community-streams">
-  <article *ngFor="let stream of streams">
-    <p class="cadence">{{ stream.cadence }}</p>
-    <h3>{{ stream.title }}</h3>
-    <p>{{ stream.summary }}</p>
-  </article>
-</section>
+    <div class="community-hero__panel">
+      <p class="card-label">Maker space bridge</p>
+      <div class="bridge-list">
+        <article *ngFor="let bridge of makerBridges">
+          <h3>{{ bridge.title }}</h3>
+          <p>{{ bridge.detail }}</p>
+          <a [routerLink]="bridge.route" class="inline-link">{{ bridge.cta }}</a>
+        </article>
+      </div>
+      <div class="spotlights">
+        <article *ngFor="let spotlight of spotlights">
+          <h4>{{ spotlight.name }}</h4>
+          <p class="project">{{ spotlight.project }}</p>
+          <p>{{ spotlight.detail }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
-<p class="fine-print">Community programming is in development—details are placeholders until launch.</p>
+  <section class="community-streams">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Gatherings</p>
+        <h2>Early programs we are piloting</h2>
+        <p class="lede muted">Stubbed programs—details and schedules will be added when live.</p>
+      </div>
+    </header>
+    <div class="program-grid">
+      <article *ngFor="let stream of streams">
+        <p class="cadence">{{ stream.cadence }}</p>
+        <h3>{{ stream.title }}</h3>
+        <p>{{ stream.summary }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="community-groups">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Groups</p>
+        <h2>Browse and join maker groups</h2>
+        <p class="lede muted">Posts and chat are coming soon; these groups are placeholders for launch.</p>
+      </div>
+    </header>
+    <div class="group-grid">
+      <article *ngFor="let group of groups">
+        <h3>{{ group.name }}</h3>
+        <p>{{ group.description }}</p>
+        <p class="group-status">{{ group.status }}</p>
+        <button type="button" class="ghost" disabled>{{ group.cta }}</button>
+      </article>
+    </div>
+  </section>
+
+  <p class="fine-print">Community programming is in development—details are placeholders until launch.</p>
+</div>
