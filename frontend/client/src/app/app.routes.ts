@@ -30,6 +30,12 @@ export const routes: Routes = [
 				loadComponent: () => import('./features/community/community.page').then(m => m.CommunityPage)
 			},
 			{
+				path: 'projects/:progressId',
+				canActivate: [authGuard],
+				data: { requiresAuth: true },
+				loadComponent: () => import('./features/projects/project.page').then(m => m.ProjectPage)
+			},
+			{
 				path: 'maker/:handle',
 				loadComponent: () => import('./features/profile/profile.page').then(m => m.ProfilePage)
 			},

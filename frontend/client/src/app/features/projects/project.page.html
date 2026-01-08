@@ -1,0 +1,87 @@
+<div class="project-page" *ngIf="!isLoading(); else loading">
+  <ng-container *ngIf="progress() as p; else loadError">
+    <section class="project-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Maker project · {{ p.patternType === 'parsed' ? 'Parsed' : 'Community' }}</p>
+        <h1 class="project-title">{{ p.title }}</h1>
+        <div class="project-meta">
+          <span class="pill status-pill">{{ statusLabel() }}</span>
+          <span class="pill neutral">Row {{ currentRowNumber() }} of {{ totalRows() }}</span>
+        </div>
+        <div class="links">
+          <a routerLink="/maker-space" class="ghost">Back to maker space</a>
+          <a *ngIf="p.patternId" [routerLink]="['/patterns', p.patternId]" class="ghost">Open pattern</a>
+        </div>
+      </div>
+      <div *ngIf="p.imageUrl" class="hero-cover" [style.backgroundImage]="'url(' + p.imageUrl + ')'"></div>
+    </section>
+
+    <section class="project-viewer" *ngIf="expandedRows().length; else noRows">
+      <div class="row-list">
+        <button
+          type="button"
+          *ngFor="let row of expandedRows(); let i = index"
+          [class.active]="i === activeRowIndex()"
+          (click)="selectRow(i)"
+        >
+          <span>Row {{ row.displayNumber }}</span>
+          <p>{{ row.instruction }}</p>
+          <small class="span-note" *ngIf="row.spanSize > 1 && row.spanIndex === 0">
+            Rows {{ row.sourceRowNumber }}-{{ row.sourceRowNumber + row.spanSize - 1 }}
+          </small>
+        </button>
+      </div>
+
+      <div class="row-detail" *ngIf="activeRow() as row">
+        <div class="row-detail__header">
+          <p class="eyebrow">Row {{ row.displayNumber }}</p>
+          <span class="pill neutral">Current</span>
+        </div>
+        <p class="instruction">{{ row.instruction }}</p>
+        <p *ngIf="row.notes" class="notes">{{ row.notes }}</p>
+        <div class="chips" *ngIf="row.stitches?.length">
+          <span *ngFor="let stitch of row.stitches">{{ stitch }}</span>
+        </div>
+        <p class="span-note" *ngIf="row.spanSize > 1">
+          Same instructions through Row {{ row.sourceRowNumber + row.spanSize - 1 }}
+        </p>
+
+        <div class="row-nav">
+          <button class="nav-btn ghost" type="button" (click)="prevRow()" [disabled]="activeRowIndex() === 0">Previous</button>
+          <button class="nav-btn solid" type="button" (click)="nextRow()" [disabled]="isLastRow()">Next</button>
+        </div>
+
+        <div class="progress-actions">
+          <div class="progress-buttons">
+            <button class="solid" type="button" (click)="saveProgress()" [disabled]="isSaving()">
+              {{ isSaving() ? 'Saving…' : 'Save progress' }}
+            </button>
+            <button
+              class="ghost"
+              type="button"
+              (click)="markComplete()"
+              [disabled]="isSaving() || !isLastRow()"
+              [class.complete-glow]="isLastRow()"
+            >
+              Mark completed
+            </button>
+          </div>
+          <p *ngIf="notice()" class="success">{{ notice() }}</p>
+          <p *ngIf="saveError()" class="error">{{ saveError() }}</p>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</div>
+
+<ng-template #loading>
+  <div class="loading">Loading project...</div>
+</ng-template>
+
+<ng-template #loadError>
+  <div class="error" *ngIf="error(); else noRows">{{ error() }}</div>
+</ng-template>
+
+<ng-template #noRows>
+  <div class="empty">No rows available for this project.</div>
+</ng-template>

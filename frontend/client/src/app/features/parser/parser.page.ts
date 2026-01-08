@@ -1,14 +1,18 @@
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, NgTemplateOutlet, UpperCasePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { PatternParserService } from '../../core/services/pattern-parser.service';
 import { PatternInputType, PatternParseResponse } from '../../core/models/parser.model';
+import { ProgressService } from '../../core/services/progress.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ProjectProgressDetail, ProgressStatus } from '../../core/models/progress.model';
 
 @Component({
   selector: 'app-parser-page',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, NgTemplateOutlet, UpperCasePipe, ReactiveFormsModule],
+  imports: [CommonModule, NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault, NgTemplateOutlet, ReactiveFormsModule],
   templateUrl: './parser.page.html',
   styleUrl: './parser.page.css'
 })
@@ -17,6 +21,10 @@ export class ParserPage {
 
   private readonly fb = inject(FormBuilder);
   private readonly parser = inject(PatternParserService);
+  private readonly progress = inject(ProgressService);
+  protected readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private pdfFile: File | null = null;
 
   protected readonly form = this.fb.group({
@@ -34,6 +42,10 @@ export class ParserPage {
   protected readonly activeRowIndex = signal(0);
   protected readonly rows = computed(() => this.result()?.rows ?? []);
   protected readonly activeRow = computed(() => this.rows()[this.activeRowIndex()] ?? null);
+  protected readonly savedProgress = signal<ProjectProgressDetail | null>(null);
+  protected readonly isSavingProgress = signal(false);
+  protected readonly progressNotice = signal<string | null>(null);
+  protected readonly progressError = signal<string | null>(null);
 
   constructor() {
     this.form.controls.inputType.valueChanges.subscribe(type => {
@@ -47,6 +59,11 @@ export class ParserPage {
       }
       control.updateValueAndValidity({ emitEvent: false });
     });
+
+    const savedId = this.route.snapshot.queryParamMap.get('saved');
+    if (savedId && this.auth.isLoggedIn()) {
+      this.router.navigate(['/projects', savedId]);
+    }
   }
 
   protected submit(): void {
@@ -58,6 +75,8 @@ export class ParserPage {
     this.isLoading.set(true);
     this.error.set(null);
     this.result.set(null);
+    this.savedProgress.set(null);
+    this.progressNotice.set(null);
     this.activeRowIndex.set(0);
 
     const payload = this.form.getRawValue();
@@ -83,6 +102,7 @@ export class ParserPage {
               this.result.set(response);
               this.activeRowIndex.set(0);
               this.isLoading.set(false);
+              this.progressNotice.set(null);
               this.scrollToResults();
             },
             error: err => {
@@ -103,6 +123,7 @@ export class ParserPage {
         this.result.set(response);
         this.activeRowIndex.set(0);
         this.isLoading.set(false);
+        this.progressNotice.set(null);
         this.scrollToResults();
       },
       error: err => {
@@ -110,6 +131,55 @@ export class ParserPage {
         this.isLoading.set(false);
       }
     });
+  }
+
+  protected saveProgress(markComplete = false): void {
+    if (!this.auth.isLoggedIn()) {
+      this.progressError.set('Sign in to save progress to your maker space.');
+      return;
+    }
+
+    const currentRows = this.rows();
+    if (!currentRows.length) {
+      this.progressError.set('Parse a pattern first to save progress.');
+      return;
+    }
+
+    const currentRowNumber = currentRows[this.activeRowIndex()]?.rowNumber ?? 1;
+    const status: ProgressStatus = markComplete ? 'completed' : 'in-progress';
+    const title = this.result()?.sourceTitle || this.form.controls.title.value || 'Parsed pattern';
+
+    this.isSavingProgress.set(true);
+    this.progressError.set(null);
+    this.progressNotice.set(null);
+
+    const existing = this.savedProgress();
+    const request$ = existing
+      ? this.progress.update(existing.id, { currentRowNumber, status })
+      : this.progress.saveParsed({
+          title,
+          rows: currentRows,
+          currentRowNumber,
+          status,
+          sourceTitle: title,
+          sourceType: this.result()?.sourceType || this.form.controls.inputType.value
+        });
+
+    request$.subscribe({
+      next: ({ progress }) => {
+        this.savedProgress.set(progress);
+        this.isSavingProgress.set(false);
+        this.progressNotice.set(markComplete ? 'Marked as completed.' : 'Progress saved to your maker space.');
+      },
+      error: () => {
+        this.isSavingProgress.set(false);
+        this.progressError.set('Could not save progress right now.');
+      }
+    });
+  }
+
+  protected markComplete(): void {
+    this.saveProgress(true);
   }
 
   protected selectRow(index: number): void {

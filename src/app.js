@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
 const parserRoutes = require('./routes/parser.routes');
 const patternRoutes = require('./routes/pattern.routes');
+const progressRoutes = require('./routes/progress.routes');
 
 const buildApp = () => {
   const app = express();
@@ -26,6 +27,7 @@ const buildApp = () => {
   app.use('/api/profiles', profileRoutes);
   app.use('/api/parser', parserRoutes);
   app.use('/api/patterns', patternRoutes);
+  app.use('/api/progress', progressRoutes);
 
   app.use((req, res) => {
     res.status(404).json({ message: 'Route not found' });

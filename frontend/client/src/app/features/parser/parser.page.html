@@ -89,16 +89,6 @@
     <div class="loading-shimmer"></div>
   </div>
 
-  <div class="result-summary" *ngIf="!isLoading() && result() as parsed">
-    <p class="eyebrow">Summary</p>
-    <p class="lede">{{ parsed.summary || 'Rows generated from your pattern.' }}</p>
-    <p class="source">Source: {{ parsed.sourceTitle || 'Untitled pattern' }} · {{ parsed.sourceType | uppercase }}</p>
-
-    <ul *ngIf="parsed.warnings?.length" class="warnings">
-      <li *ngFor="let warning of parsed.warnings">{{ warning }}</li>
-    </ul>
-  </div>
-
   <div class="row-viewer" *ngIf="!isLoading() && activeRow() as row">
     <div class="row-list">
       <button
@@ -127,6 +117,27 @@
         <button type="button" (click)="nextRow()" [disabled]="activeRowIndex() >= rows().length - 1">
           Next row
         </button>
+      </div>
+
+      <div class="progress-actions">
+        <p class="eyebrow">Maker space</p>
+        <p class="progress-note">Row {{ (activeRowIndex() + 1) }} of {{ rows().length }}</p>
+        <div class="buttons">
+          <button type="button" (click)="saveProgress()" [disabled]="isSavingProgress() || !auth.isLoggedIn()">
+            {{ isSavingProgress() ? 'Saving…' : savedProgress() ? 'Update progress' : 'Save progress' }}
+          </button>
+          <button
+            type="button"
+            class="ghost"
+            (click)="markComplete()"
+            [disabled]="isSavingProgress() || activeRowIndex() < rows().length - 1"
+          >
+            Mark completed
+          </button>
+        </div>
+        <p *ngIf="!auth.isLoggedIn()" class="muted">Sign in to save and resume progress.</p>
+        <p *ngIf="progressNotice()" class="success">{{ progressNotice() }}</p>
+        <p *ngIf="progressError()" class="error">{{ progressError() }}</p>
       </div>
     </div>
   </div>

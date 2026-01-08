@@ -133,7 +133,7 @@
 
 .shell-main {
   flex: 1;
-  padding-top: clamp(5.5rem, 8vh, 7.5rem);
+  padding-top: clamp(6.5rem, 11vh, 9rem);
   padding-bottom: clamp(2rem, 4vh, 3rem);
   background: var(--paper-grain), var(--sand-50);
   background-attachment: fixed;

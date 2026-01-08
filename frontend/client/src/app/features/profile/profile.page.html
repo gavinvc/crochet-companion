@@ -13,7 +13,7 @@
     <div class="profile-card" *ngIf="isPersonalSpace">
       <p class="card-label">Quick pulse</p>
       <h3>{{ myPatterns().length }} published</h3>
-      <p>{{ followedPatterns().length }} followed</p>
+      <p>{{ followedPatterns().length }} followed · {{ completedProjects().length }} completed</p>
       <a routerLink="/patterns" class="inline-link">Manage patterns</a>
     </div>
     <div class="profile-card" *ngIf="!isPersonalSpace">
@@ -22,73 +22,114 @@
     </div>
   </section>
 
-  <section class="maker-section" *ngIf="isPersonalSpace">
-    <header class="section-header">
-      <div>
-        <p class="eyebrow">Maker space</p>
-        <h2>Your patterns</h2>
-        <p class="lede muted">Tap to jump straight into playback.</p>
-      </div>
-    </header>
-    <div *ngIf="isLoading()" class="loading">Loading your patterns...</div>
-    <div class="maker-grid" *ngIf="!isLoading() && myPatterns().length; else emptyMine">
-      <article class="maker-card" *ngFor="let pattern of myPatterns()">
-        <div class="maker-card__head">
-          <h3>{{ pattern.title }}</h3>
-          <span class="pill">{{ rowsPreview(pattern) }}</span>
+  <div class="maker-columns" *ngIf="isPersonalSpace">
+    <div class="maker-column">
+      <section class="maker-section">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Maker space</p>
+            <h2>Active projects</h2>
+            <p class="lede muted">Save your place and pick up right where you stopped.</p>
+          </div>
+        </header>
+        <p *ngIf="projectsError()" class="error">{{ projectsError() }}</p>
+        <div class="maker-grid" *ngIf="inProgressProjects().length; else emptyProjects">
+          <article class="maker-card" *ngFor="let project of inProgressProjects()">
+            <div class="maker-card__head">
+              <h3>{{ project.title }}</h3>
+              <span class="pill">{{ project.patternType === 'parsed' ? 'Parsed' : 'Community' }}</span>
+            </div>
+            <p class="maker-card__meta">{{ projectProgressLabel(project) }}</p>
+            <div class="maker-card__actions">
+              <a [routerLink]="['/projects', project.id]" class="inline-link">Resume</a>
+              <span class="pill ghost">{{ project.status }}</span>
+            </div>
+          </article>
         </div>
-        <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
-        <div class="maker-card__actions">
-          <a [routerLink]="['/patterns', pattern.id]" class="inline-link">Open</a>
-          <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+        <ng-template #emptyProjects>
+          <p class="empty">No active projects yet. Open a pattern or parser result to start tracking.</p>
+        </ng-template>
+      </section>
+
+      <section class="maker-section">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Maker space</p>
+            <h2>Completed projects</h2>
+            <p class="lede muted">Finished items live here with your running total.</p>
+          </div>
+        </header>
+        <div class="maker-grid" *ngIf="completedProjects().length; else emptyCompleted">
+          <article class="maker-card" *ngFor="let project of completedProjects()">
+            <div class="maker-card__head">
+              <h3>{{ project.title }}</h3>
+              <span class="pill">{{ project.patternType === 'parsed' ? 'Parsed' : 'Community' }}</span>
+            </div>
+            <p class="maker-card__meta">Completed · {{ project.completedAt | date: 'mediumDate' }}</p>
+            <div class="maker-card__actions">
+              <a [routerLink]="['/projects', project.id]" class="inline-link">Open project</a>
+            </div>
+          </article>
         </div>
-      </article>
+        <ng-template #emptyCompleted>
+          <p class="empty">No completed projects yet.</p>
+        </ng-template>
+      </section>
     </div>
-    <ng-template #emptyMine>
-      <p class="empty">You have not published any patterns yet.</p>
-    </ng-template>
-  </section>
 
-  <section class="maker-section" *ngIf="isPersonalSpace">
-    <header class="section-header">
-      <div>
-        <p class="eyebrow">Maker space</p>
-        <h2>Followed patterns</h2>
-        <p class="lede muted">Saved patterns you are following.</p>
-      </div>
-    </header>
-    <div class="maker-grid" *ngIf="followedPatterns().length; else emptyFollowing">
-      <article class="maker-card" *ngFor="let pattern of followedPatterns()">
-        <div class="maker-card__head">
-          <h3>{{ pattern.title }}</h3>
-          <span class="pill">{{ rowsPreview(pattern) }}</span>
+    <div class="maker-column">
+      <section class="maker-section">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Maker space</p>
+            <h2>Your patterns</h2>
+            <p class="lede muted">Tap to jump straight into playback.</p>
+          </div>
+        </header>
+        <div *ngIf="isLoading()" class="loading">Loading your patterns...</div>
+        <div class="maker-grid" *ngIf="!isLoading() && myPatterns().length; else emptyMine">
+          <article class="maker-card" *ngFor="let pattern of myPatterns()">
+            <div class="maker-card__head">
+              <h3>{{ pattern.title }}</h3>
+              <span class="pill">{{ rowsPreview(pattern) }}</span>
+            </div>
+            <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
+            <div class="maker-card__actions">
+              <a [routerLink]="['/patterns', pattern.id]" class="inline-link">Open</a>
+              <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+            </div>
+          </article>
         </div>
-        <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
-        <div class="maker-card__actions">
-          <a [routerLink]="['/patterns', pattern.id]" class="inline-link">Open</a>
-          <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+        <ng-template #emptyMine>
+          <p class="empty">You have not published any patterns yet.</p>
+        </ng-template>
+      </section>
+
+      <section class="maker-section">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Maker space</p>
+            <h2>Followed patterns</h2>
+            <p class="lede muted">Saved patterns you are following.</p>
+          </div>
+        </header>
+        <div class="maker-grid" *ngIf="followedPatterns().length; else emptyFollowing">
+          <article class="maker-card" *ngFor="let pattern of followedPatterns()">
+            <div class="maker-card__head">
+              <h3>{{ pattern.title }}</h3>
+              <span class="pill">{{ rowsPreview(pattern) }}</span>
+            </div>
+            <p class="maker-card__meta">{{ pattern.followerCount || 0 }} followers</p>
+            <div class="maker-card__actions">
+              <a [routerLink]="['/patterns', pattern.id]" class="inline-link">Open</a>
+              <button type="button" class="ghost danger" *ngIf="pattern.isOwner" (click)="deletePattern(pattern)">Delete</button>
+            </div>
+          </article>
         </div>
-      </article>
+        <ng-template #emptyFollowing>
+          <p class="empty">You are not following any patterns yet.</p>
+        </ng-template>
+      </section>
     </div>
-    <ng-template #emptyFollowing>
-      <p class="empty">You are not following any patterns yet.</p>
-    </ng-template>
-  </section>
-
-  <section class="panels">
-    <article *ngFor="let panel of panels">
-      <h3>{{ panel.title }}</h3>
-      <p>{{ panel.description }}</p>
-      <button type="button" disabled>{{ panel.cta }}</button>
-    </article>
-  </section>
-
-  <section class="quick-actions">
-    <article *ngFor="let action of actions">
-      <h4>{{ action.label }}</h4>
-      <p>{{ action.description }}</p>
-    </article>
-  </section>
-
-  <p class="fine-print">Maker dashboards are still in development; more insights will land here soon.</p>
+  </div>
 </div>

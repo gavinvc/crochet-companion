@@ -11,6 +11,7 @@ export interface User {
     patternsShared: number;
     patternsFavorited: number;
     stitchesTracked: number;
+    projectsCompleted?: number;
   };
   favoriteYarns?: string[];
   createdAt?: string;

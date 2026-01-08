@@ -69,43 +69,16 @@
   font-weight: 700;
 }
 
-.panels {
+.maker-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.panels article {
-  border: 1px solid var(--ink-100);
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.panels button {
-  align-self: flex-start;
-  border: none;
-  background: var(--ink-900);
-  color: var(--sand-50);
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1rem;
 }
 
-.quick-actions article {
-  border: 1px dashed var(--ink-200);
-  border-radius: 1.25rem;
-  padding: 1.25rem;
+.maker-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .maker-section {

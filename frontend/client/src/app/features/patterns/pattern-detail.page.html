@@ -45,9 +45,26 @@
       <p class="span-note" *ngIf="row.spanSize > 1">
         Same instructions through Row {{ row.sourceRowNumber + row.spanSize - 1 }}
       </p>
+      <p class="progress-hint">Progress: Row {{ currentRowNumber() }} of {{ expandedRows().length }}</p>
       <div class="row-nav">
-        <button type="button" (click)="prevRow()" [disabled]="activeRowIndex() === 0">Previous</button>
-        <button type="button" (click)="nextRow()" [disabled]="activeRowIndex() >= expandedRows().length - 1">Next</button>
+        <button class="nav-btn ghost" type="button" (click)="prevRow()" [disabled]="activeRowIndex() === 0">Previous</button>
+        <button class="nav-btn solid" type="button" (click)="nextRow()" [disabled]="activeRowIndex() >= expandedRows().length - 1">Next</button>
+      </div>
+      <div class="progress-actions">
+        <button class="solid" type="button" (click)="saveProgress()" [disabled]="isSavingProgress()">
+          {{ isSavingProgress() ? 'Saving…' : progress() ? 'Update progress' : 'Save progress' }}
+        </button>
+        <button
+          type="button"
+          class="ghost"
+          (click)="markComplete()"
+          [disabled]="isSavingProgress() || activeRowIndex() < expandedRows().length - 1"
+          [class.complete-glow]="activeRowIndex() >= expandedRows().length - 1"
+        >
+          Mark completed
+        </button>
+        <p *ngIf="progressNotice()" class="success">{{ progressNotice() }}</p>
+        <p *ngIf="progressError()" class="error">{{ progressError() }}</p>
       </div>
     </div>
   </section>

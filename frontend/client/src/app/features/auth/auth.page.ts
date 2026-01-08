@@ -29,9 +29,9 @@ export class AuthPage {
   protected readonly experienceLevels = ['beginner', 'confident-beginner', 'intermediate', 'advanced', 'designer'];
 
   protected readonly benefits: AuthBenefit[] = [
-    { title: 'Sync every parser run', detail: 'Save outputs to your maker space with one tap.' },
-    { title: 'Focus-friendly timers', detail: 'Track rows with breathing reminders and context notes.' },
-    { title: 'Community drop-ins', detail: 'Join critique tables and share your space with collaborators.' }
+    { title: 'Save parsed outputs', detail: 'Store parser results as projects and pick up where you stopped.' },
+    { title: 'Active + completed projects', detail: 'Resume in-progress makes and see your finished count in maker space.' },
+    { title: 'Follow and manage patterns', detail: 'Keep your own patterns and followed community patterns in one place.' }
   ];
 
   protected readonly loginForm = this.fb.nonNullable.group({

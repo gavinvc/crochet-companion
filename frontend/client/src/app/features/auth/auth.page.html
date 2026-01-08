@@ -9,10 +9,10 @@
     <h1 *ngIf="mode() === 'register'">Set up your maker space.</h1>
 
     <p *ngIf="mode() === 'login'" class="lede">
-      Sign in to access your parser history, synced projects, and studio invite links.
+      Sign in to save parser outputs, resume active projects, and manage your maker space patterns.
     </p>
     <p *ngIf="mode() === 'register'" class="lede">
-      Create a handle, set your preferred pace, and unlock community programs curated for crocheters.
+      Create your maker space to publish patterns, follow community patterns, and track your project progress.
     </p>
 
     <form *ngIf="mode() === 'login'" class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
@@ -81,7 +81,7 @@
       <a routerLink="/maker-space">Go to maker space</a>
     </div>
     <p class="fine-print">
-      By continuing you agree to receive occasional studio journals. You can unsubscribe any time.
+      We’ll only email you about your account and maker space updates.
     </p>
   </div>
 

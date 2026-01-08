@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PatternDetail } from '../../core/models/pattern.model';
 import { isSamplePatternId } from '../../core/data/sample-patterns';
+import { ProjectProgressDetail, ProgressStatus } from '../../core/models/progress.model';
+import { ProgressService } from '../../core/services/progress.service';
 
 type ExpandedRow = {
   displayNumber: number;
@@ -29,11 +31,17 @@ export class PatternDetailPage {
   private readonly router = inject(Router);
   private readonly patterns = inject(PatternService);
   protected readonly auth = inject(AuthService);
+  private readonly progressSvc = inject(ProgressService);
 
   protected readonly isLoading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly pattern = signal<PatternDetail | null>(null);
   protected readonly activeRowIndex = signal(0);
+  protected readonly isSavingProgress = signal(false);
+  protected readonly progressNotice = signal<string | null>(null);
+  protected readonly progressError = signal<string | null>(null);
+  protected readonly progress = signal<ProjectProgressDetail | null>(null);
+  private pendingRowNumber: number | null = null;
 
   protected readonly expandedRows = computed<ExpandedRow[]>(() => {
     const current = this.pattern();
@@ -63,6 +71,7 @@ export class PatternDetailPage {
     const patternId = this.route.snapshot.paramMap.get('patternId');
     if (patternId) {
       this.loadPattern(patternId);
+      this.loadProgress(patternId);
     } else {
       this.error.set('Pattern not found.');
     }
@@ -74,12 +83,29 @@ export class PatternDetailPage {
     this.patterns.get(patternId).subscribe({
       next: ({ pattern }) => {
         this.pattern.set(pattern);
-        this.activeRowIndex.set(0);
+        const targetRow = this.pendingRowNumber ?? 0;
+        this.activeRowIndex.set(this.indexForRowNumber(targetRow));
         this.isLoading.set(false);
       },
       error: () => {
         this.error.set('Could not load that pattern.');
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  private loadProgress(patternId: string): void {
+    this.progressSvc.getForPattern(patternId).subscribe({
+      next: ({ progress }) => {
+        if (!progress) return;
+        this.progress.set(progress);
+        this.pendingRowNumber = progress.currentRowNumber || null;
+        if (this.pattern()) {
+          this.activeRowIndex.set(this.indexForRowNumber(progress.currentRowNumber));
+        }
+      },
+      error: () => {
+        this.progressError.set('Could not load saved progress.');
       }
     });
   }
@@ -99,6 +125,64 @@ export class PatternDetailPage {
       },
       error: () => this.error.set('Unable to update follow state right now.')
     });
+  }
+
+  protected saveProgress(markComplete = false): void {
+    const currentPattern = this.pattern();
+    if (!currentPattern) return;
+
+    const currentRowNumber = this.currentRowNumber();
+    const status: ProgressStatus = markComplete ? 'completed' : 'in-progress';
+
+    this.isSavingProgress.set(true);
+    this.progressError.set(null);
+    this.progressNotice.set(null);
+
+    const existing = this.progress();
+    const isSample = isSamplePatternId(currentPattern.id);
+
+    const request$ = existing
+      ? this.progressSvc.update(existing.id, { currentRowNumber, status })
+      : isSample
+        ? this.progressSvc.saveParsed({
+            title: currentPattern.title,
+            rows: currentPattern.rows,
+            currentRowNumber,
+            status,
+            sourceTitle: currentPattern.title,
+            sourceType: 'community-sample',
+            imageUrl: currentPattern.imageUrl
+          })
+        : this.progressSvc.saveCommunity({ patternId: currentPattern.id, currentRowNumber, status });
+
+    request$.subscribe({
+      next: ({ progress }) => {
+        this.progress.set(progress);
+        this.activeRowIndex.set(this.indexForRowNumber(progress.currentRowNumber));
+        this.isSavingProgress.set(false);
+        this.progressNotice.set(markComplete ? 'Marked as completed.' : 'Progress saved.');
+      },
+      error: () => {
+        this.isSavingProgress.set(false);
+        this.progressError.set('Could not save progress right now.');
+      }
+    });
+  }
+
+  protected markComplete(): void {
+    this.saveProgress(true);
+  }
+
+  protected currentRowNumber(): number {
+    const row = this.expandedRows()[this.activeRowIndex()];
+    return row?.displayNumber ?? 1;
+  }
+
+  private indexForRowNumber(rowNumber: number | null): number {
+    if (!rowNumber || rowNumber < 1) return 0;
+    const rows = this.expandedRows();
+    const foundIndex = rows.findIndex(r => r.displayNumber === rowNumber);
+    return foundIndex === -1 ? 0 : foundIndex;
   }
 
   protected selectRow(index: number): void {

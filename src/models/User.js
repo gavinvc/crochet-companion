@@ -6,7 +6,8 @@ const statsSchema = new mongoose.Schema(
   {
     patternsShared: { type: Number, default: 0 },
     patternsFavorited: { type: Number, default: 0 },
-    stitchesTracked: { type: Number, default: 0 }
+    stitchesTracked: { type: Number, default: 0 },
+    projectsCompleted: { type: Number, default: 0 }
   },
   { _id: false }
 );

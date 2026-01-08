@@ -169,19 +169,37 @@
   gap: 0.75rem;
 }
 
-.row-nav button {
+.nav-btn {
   flex: 1;
   padding: 0.85rem 1rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #f7f2ed;
+  border-radius: 10px;
+  border: 1px solid #d6c8bb;
+  background: #fffaf6;
+  color: #5d3b2d;
   font-weight: 700;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
 }
 
-.row-nav button:disabled {
-  opacity: 0.6;
+.nav-btn.solid {
+  background: #f08b57;
+  color: #fff;
+  border-color: #f08b57;
+}
+
+.nav-btn.ghost {
+  background: #fff;
+}
+
+.nav-btn:hover:not(:disabled) {
+  border-color: #d49b6a;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .loading,
@@ -193,6 +211,87 @@
 .error {
   color: #b3261e;
   font-weight: 600;
+}
+
+.progress-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-actions button {
+  width: fit-content;
+}
+
+.progress-hint {
+  color: var(--ink-700);
+  margin: 0.25rem 0 0.35rem;
+  font-weight: 600;
+}
+
+.solid {
+  background: #f08b57;
+  color: #fff;
+  border: 1px solid #f08b57;
+  padding: 0.65rem 1.05rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.solid:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(240, 139, 87, 0.25);
+}
+
+.ghost {
+  border: 1px solid #d4b8a6;
+  background: transparent;
+  padding: 0.6rem 0.95rem;
+  border-radius: 10px;
+  color: #5d3b2d;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
+}
+
+.ghost:hover:not(:disabled) {
+  border-color: #d49b6a;
+  color: #2f1b10;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.ghost:disabled,
+.solid:disabled,
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.complete-glow {
+  border-color: #f08b57;
+  color: #f08b57;
+  box-shadow: 0 0 0 0 rgba(240, 139, 87, 0.45), 0 10px 24px rgba(240, 139, 87, 0.25);
+  animation: pulseGlow 1.6s ease-in-out infinite;
+}
+
+.complete-glow:disabled {
+  animation: none;
+  box-shadow: none;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(240, 139, 87, 0.45), 0 10px 24px rgba(240, 139, 87, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(240, 139, 87, 0), 0 10px 24px rgba(240, 139, 87, 0.12);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(240, 139, 87, 0), 0 10px 24px rgba(240, 139, 87, 0.12);
+  }
 }
 
 @media (max-width: 900px) {

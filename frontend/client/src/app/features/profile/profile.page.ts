@@ -1,9 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PatternService } from '../../core/services/pattern.service';
 import { PatternSummary } from '../../core/models/pattern.model';
+import { ProgressService } from '../../core/services/progress.service';
+import { ProjectProgress } from '../../core/models/progress.model';
 
 type DashboardPanel = {
   title: string;
@@ -19,13 +21,14 @@ type QuickAction = {
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [NgFor, NgIf, RouterLink],
+  imports: [NgFor, NgIf, RouterLink, DatePipe],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.css'
 })
 export class ProfilePage {
   private readonly route = inject(ActivatedRoute);
   private readonly patternsSvc = inject(PatternService);
+  private readonly progressSvc = inject(ProgressService);
 
   protected readonly handle = this.route.snapshot.paramMap.get('handle');
   protected readonly isPersonalSpace = !this.handle;
@@ -38,6 +41,9 @@ export class ProfilePage {
   protected readonly followedPatterns = signal<PatternSummary[]>([]);
   protected readonly error = signal<string | null>(null);
   protected readonly isLoading = signal(false);
+  protected readonly projectsError = signal<string | null>(null);
+  protected readonly inProgressProjects = signal<ProjectProgress[]>([]);
+  protected readonly completedProjects = signal<ProjectProgress[]>([]);
 
   protected readonly panels: DashboardPanel[] = [
     {
@@ -67,6 +73,7 @@ export class ProfilePage {
     if (this.isPersonalSpace) {
       this.loadMyPatterns();
       this.loadFollowedPatterns();
+      this.loadProjects();
     }
   }
 
@@ -90,6 +97,17 @@ export class ProfilePage {
     });
   }
 
+  private loadProjects(): void {
+    this.projectsError.set(null);
+    this.progressSvc.list().subscribe({
+      next: ({ inProgress, completed }) => {
+        this.inProgressProjects.set(inProgress);
+        this.completedProjects.set(completed);
+      },
+      error: () => this.projectsError.set('Could not load your projects right now.')
+    });
+  }
+
   protected rowsPreview(pattern: PatternSummary): string {
     return `${pattern.rowCount} rows`;
   }
@@ -106,5 +124,11 @@ export class ProfilePage {
       },
       error: () => this.error.set('Could not delete this pattern right now.')
     });
+  }
+
+  protected projectProgressLabel(project: ProjectProgress): string {
+    const total = Math.max(1, project.rowCount || 1);
+    const current = Math.min(total, project.currentRowNumber || 1);
+    return `${current} / ${total} rows`;
   }
 }
