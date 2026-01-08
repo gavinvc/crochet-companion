@@ -18,7 +18,13 @@ const buildHandle = (preferred) => {
   return base || withRandomSuffix('maker');
 };
 
+const buildSlug = (value) => {
+  const base = createHandleBase(value);
+  return base || withRandomSuffix('group');
+};
+
 module.exports = {
   buildHandle,
-  withRandomSuffix
+  withRandomSuffix,
+  buildSlug
 };

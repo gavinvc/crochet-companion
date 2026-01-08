@@ -1,74 +1,115 @@
 <div class="community-page">
   <section class="community-hero">
     <div class="community-hero__copy">
-      <p class="eyebrow">Community</p>
-      <h1>Community gatherings are opening in waves.</h1>
+      <p class="eyebrow">Groups</p>
+      <h1>Find the right community to share posts, chat, and pattern-linked threads.</h1>
       <p class="lede">
-        We are pairing maker spaces with critique tables, async studio notes, and slow-make circles. Community features
-        are still opening in waves.
+        Browse active groups, filter by tags, and jump into threads that match your craft focus. Keep your hands on the yarn while
+        the community keeps the ideas flowing.
       </p>
       <div class="hero-actions">
-        <a routerLink="/auth" class="cta primary">Join the waitlist</a>
-        <a routerLink="/patterns" class="cta ghost">Browse patterns</a>
+        <button type="button" class="cta primary" (click)="scrollToGroups()">Find a group</button>
+        <button type="button" class="cta outline" (click)="openCreateModal()">Create a group</button>
       </div>
-      <div class="hero-bullets">
-        <span class="pill" *ngFor="let point of heroBullets">{{ point }}</span>
-      </div>
-    </div>
-
-    <div class="community-hero__panel">
-      <p class="card-label">Maker space bridge</p>
-      <div class="bridge-list">
-        <article *ngFor="let bridge of makerBridges">
-          <h3>{{ bridge.title }}</h3>
-          <p>{{ bridge.detail }}</p>
-          <a [routerLink]="bridge.route" class="inline-link">{{ bridge.cta }}</a>
-        </article>
-      </div>
-      <div class="spotlights">
-        <article *ngFor="let spotlight of spotlights">
-          <h4>{{ spotlight.name }}</h4>
-          <p class="project">{{ spotlight.project }}</p>
-          <p>{{ spotlight.detail }}</p>
-        </article>
-      </div>
+      <p *ngIf="error()" class="error">{{ error() }}</p>
     </div>
   </section>
 
-  <section class="community-streams">
-    <header class="section-header">
-      <div>
-        <p class="eyebrow">Gatherings</p>
-        <h2>Early programs we are piloting</h2>
-        <p class="lede muted">Stubbed programs—details and schedules will be added when live.</p>
-      </div>
-    </header>
-    <div class="program-grid">
-      <article *ngFor="let stream of streams">
-        <p class="cadence">{{ stream.cadence }}</p>
-        <h3>{{ stream.title }}</h3>
-        <p>{{ stream.summary }}</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="community-groups">
+  <section class="community-groups" id="groups">
     <header class="section-header">
       <div>
         <p class="eyebrow">Groups</p>
-        <h2>Browse and join maker groups</h2>
-        <p class="lede muted">Posts and chat are coming soon; these groups are placeholders for launch.</p>
+        <h2>Active community groups</h2>
+        <p class="lede muted">Join to view posts and chat. Pattern links appear on cards and inside threads.</p>
       </div>
+      <button type="button" class="ghost" (click)="loadGroups()" [disabled]="isLoading()">Refresh</button>
     </header>
-    <div class="group-grid">
-      <article *ngFor="let group of groups">
-        <h3>{{ group.name }}</h3>
-        <p>{{ group.description }}</p>
-        <p class="group-status">{{ group.status }}</p>
-        <button type="button" class="ghost" disabled>{{ group.cta }}</button>
+
+    <div *ngIf="isLoading()" class="loading">Loading groups...</div>
+    <p *ngIf="!isLoading() && groups().length === 0" class="empty">No groups yet. Create one to get started.</p>
+
+    <div class="group-grid" *ngIf="groups().length > 0">
+      <article *ngFor="let group of groups()">
+        <div class="cover" *ngIf="group.coverImageUrl" [style.backgroundImage]="'url(' + group.coverImageUrl + ')'">
+          <span class="pill">{{ group.memberCount }} members</span>
+        </div>
+        <div class="group-body">
+          <h3>{{ group.name }}</h3>
+          <p>{{ group.description || 'No description yet.' }}</p>
+          <div class="tags" *ngIf="group.tags.length">
+            <span class="tag" *ngFor="let tag of group.tags">{{ tag }}</span>
+          </div>
+          <div class="stats">
+            <span>{{ group.postCount }} posts</span>
+            <span>{{ group.messageCount }} chat msgs</span>
+          </div>
+          <div class="featured" *ngIf="group.featuredPatterns.length">
+            <p class="subheading">Featured patterns</p>
+            <div class="chips">
+              <a *ngFor="let pattern of group.featuredPatterns" [routerLink]="['/patterns', pattern.id]" class="chip">
+                {{ pattern.title || 'Pattern' }}
+              </a>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="secondary" (click)="open(group)">Open group</button>
+            <button
+              type="button"
+              (click)="group.isMember ? leave(group) : join(group)"
+              [class.ghost]="group.isMember"
+            >
+              {{ group.isMember ? 'Leave group' : 'Join group' }}
+            </button>
+          </div>
+        </div>
       </article>
     </div>
   </section>
 
-  <p class="fine-print">Community programming is in development—details are placeholders until launch.</p>
+  <div class="modal-backdrop" *ngIf="showCreateModal()" (click)="closeCreateModal()">
+    <article class="modal" role="dialog" aria-modal="true" aria-labelledby="create-group-title" (click)="$event.stopPropagation()">
+      <header class="modal__header">
+        <div>
+          <p class="card-label">Create a group</p>
+          <h2 id="create-group-title">Start a new community</h2>
+          <p class="muted">Launch a focused space with posts, chat, and optional featured patterns.</p>
+        </div>
+        <button type="button" class="icon-button" (click)="closeCreateModal()" aria-label="Close">×</button>
+      </header>
+
+      <form [formGroup]="createForm" (ngSubmit)="createGroup()" novalidate>
+        <label>
+          <span>Name</span>
+          <input formControlName="name" placeholder="e.g., Texture Lab" />
+        </label>
+
+        <label>
+          <span>Description</span>
+          <textarea formControlName="description" rows="2" placeholder="What do you discuss?"></textarea>
+        </label>
+
+        <label>
+          <span>Cover image URL</span>
+          <input formControlName="coverImageUrl" placeholder="https://..." />
+        </label>
+
+        <label>
+          <span>Tags (comma separated)</span>
+          <input formControlName="tags" placeholder="granny squares, textured, beanies" />
+        </label>
+
+        <label>
+          <span>Featured pattern IDs (comma separated)</span>
+          <input formControlName="featuredPatternIds" placeholder="Optional pattern ids to highlight" />
+        </label>
+
+        <div class="modal__actions">
+          <button type="button" class="ghost" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" [disabled]="isCreating()">{{ isCreating() ? 'Creating...' : 'Launch group' }}</button>
+        </div>
+        <p *ngIf="createError()" class="error">{{ createError() }}</p>
+        <p class="hint">Add pattern ids to spotlight references; members can also link patterns inside posts.</p>
+      </form>
+    </article>
+  </div>
 </div>

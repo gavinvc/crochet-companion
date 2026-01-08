@@ -32,6 +32,8 @@ const toSummary = (pattern, viewerId) => {
   const followerCount = pattern.followers?.length || 0;
   const isFollowing = viewerId ? pattern.followers.some(f => f.equals(viewerId)) : false;
   const rowCount = (pattern.rows || []).reduce((sum, r) => sum + (r.rowSpan || 1), 0);
+  const isSample = Boolean(pattern.isSample);
+  const isOwner = viewerId ? pattern.author?._id?.toString() === viewerId.toString() : false;
   return {
     id: pattern._id.toString(),
     title: pattern.title,
@@ -41,7 +43,9 @@ const toSummary = (pattern, viewerId) => {
     rowCount,
     author: pattern.author,
     isFollowing,
-    isOwner: viewerId ? pattern.author?._id?.toString() === viewerId.toString() : false,
+    isOwner,
+    isSample,
+    canDelete: isOwner && !isSample,
     createdAt: pattern.createdAt
   };
 };
@@ -128,6 +132,7 @@ const getPattern = async (req, res, next) => {
 
     const followerCount = pattern.followers?.length || 0;
     const isFollowing = viewerId ? pattern.followers.some(f => f.toString() === viewerId) : false;
+    const isSample = Boolean(pattern.isSample);
     const isOwner = viewerId ? pattern.author?._id?.toString() === viewerId.toString() : false;
 
     return res.json({
@@ -142,6 +147,8 @@ const getPattern = async (req, res, next) => {
         rows: pattern.rows,
         isFollowing,
         isOwner,
+        isSample,
+        canDelete: isOwner && !isSample,
         createdAt: pattern.createdAt
       }
     });
@@ -187,7 +194,12 @@ const deletePattern = async (req, res, next) => {
       return res.status(404).json({ message: 'Pattern not found' });
     }
 
-    if (!pattern.author.equals(req.user._id)) {
+    if (pattern.isSample) {
+      return res.status(403).json({ message: 'Sample patterns cannot be deleted.' });
+    }
+
+    const isOwner = pattern.author?.toString?.() === req.user._id.toString();
+    if (!isOwner) {
       return res.status(403).json({ message: 'You can only delete your own patterns.' });
     }
 

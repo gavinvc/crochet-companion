@@ -17,7 +17,7 @@ const samplePatterns = [
   {
     title: 'Sunny Granny Square Coaster',
     description: 'Beginner-friendly granny square that works up in under 30 minutes.',
-    imageUrl: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://www.craftpassion.com/wp-content/uploads/crochet-solid-granny-square-coaster-720x405.jpg',
     rows: [
       {
         rowNumber: 1,
@@ -51,7 +51,7 @@ const samplePatterns = [
   {
     title: 'Textured Mug Rug',
     description: 'Short, satisfying make with woven texture and tidy fringe.',
-    imageUrl: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://kickincrochet.com/wp-content/uploads/2022/07/IMG_20220612_073801625_BURST000_COVER_TOPms.jpg',
     rows: [
       {
         rowNumber: 1,
@@ -81,7 +81,7 @@ const samplePatterns = [
   {
     title: 'Chunky Ribbed Beanie',
     description: 'No-seam beanie worked flat with gentle stretch and cozy brim.',
-    imageUrl: 'https://images.unsplash.com/photo-1506617420156-8e4536971650?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://www.crochet365knittoo.com/wp-content/uploads/2019/12/Ribbed-Wonder-Hat-to-the-side.jpg',
     rows: [
       {
         rowNumber: 1,
@@ -127,7 +127,8 @@ const upsertPattern = async (userId, patternData) => {
 
   const payload = {
     ...patternData,
-    author: userId
+    author: userId,
+    isSample: true
   };
 
   if (existing) {

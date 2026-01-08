@@ -2,59 +2,15 @@
   <section class="patterns-hero">
     <div class="patterns-hero__copy">
       <p class="eyebrow">Pattern sharing</p>
-      <h1>Share your pattern with images and rows everyone can walk through.</h1>
+      <h1>Find patterns to follow, save, and open row-by-row.</h1>
       <p class="lede">
-        Publish a pattern with a cover image and numbered rows. Makers can follow it or open the row-by-row view just like a parsed pattern.
+        Browse shared patterns with images and numbered rows. Jump into a guided view, follow what you like, and keep everything in one place.
       </p>
-      <div class="hero-stats">
-        <div class="stat">
-          <p class="value">Row-by-row</p>
-          <p class="label">Guided playback</p>
-        </div>
-        <div class="stat">
-          <p class="value">Images</p>
-          <p class="label">Showcase your work</p>
-        </div>
-        <div class="stat">
-          <p class="value">Follow</p>
-          <p class="label">Save for later</p>
-        </div>
+      <div class="hero-actions">
+        <button type="button" class="cta primary" (click)="scrollToPatterns()">Find patterns</button>
+        <button type="button" class="cta outline" (click)="openShareModal()">Share a pattern</button>
       </div>
     </div>
-
-    <article class="share-card share-card--form" id="share-form" *ngIf="auth.isLoggedIn(); else shareSignIn">
-      <p class="card-label">Share a pattern</p>
-      <form [formGroup]="shareForm" (ngSubmit)="sharePattern()" novalidate>
-        <label>
-          <span>Title</span>
-          <input formControlName="title" placeholder="e.g., Cozy Moss Stitch Throw" />
-        </label>
-
-        <label>
-          <span>Description</span>
-          <textarea formControlName="description" rows="2" placeholder="Short description"></textarea>
-        </label>
-
-        <label>
-          <span>Image URL (optional)</span>
-          <input formControlName="imageUrl" placeholder="https://..." />
-        </label>
-
-        <label>
-          <span>Rows (one per line)</span>
-          <textarea formControlName="rowsInput" rows="5" placeholder="Row 1: ...&#10;Rows 3-5: repeat step..."></textarea>
-        </label>
-
-        <button type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Saving...' : 'Publish pattern' }}</button>
-      </form>
-    </article>
-    <ng-template #shareSignIn>
-      <article class="share-card share-card--signin">
-        <p class="card-label">Sign in to share</p>
-        <p class="lede">Create an account to publish patterns with images and rows.</p>
-        <a routerLink="/auth" class="cta">Go to sign in</a>
-      </article>
-    </ng-template>
   </section>
 
   <section class="maker-section" *ngIf="auth.isLoggedIn()">
@@ -64,7 +20,7 @@
         <h2>Your patterns</h2>
         <p class="lede muted">Quick access to what you published.</p>
       </div>
-      <a class="cta ghost" href="#share-form">Create pattern</a>
+      <button type="button" class="cta ghost" (click)="openShareModal()">Share a pattern</button>
     </header>
 
     <div class="maker-grid" *ngIf="myPatterns().length; else emptyMine">
@@ -117,7 +73,7 @@
     </ng-template>
   </section>
 
-  <section class="pattern-list">
+  <section class="pattern-list" id="patterns">
     <header>
       <p class="eyebrow">Community patterns</p>
       <h2>Follow or open any shared pattern.</h2>
@@ -162,4 +118,54 @@
       </article>
     </div>
   </section>
+
+  <div class="modal-backdrop" *ngIf="showShareModal()" (click)="closeShareModal()">
+    <article class="modal" role="dialog" aria-modal="true" aria-labelledby="share-pattern-title" (click)="$event.stopPropagation()">
+      <header class="modal__header">
+        <div>
+          <p class="card-label">Share a pattern</p>
+          <h2 id="share-pattern-title">Publish a pattern with rows</h2>
+          <p class="muted">Add a cover image, description, and row-by-row instructions.</p>
+        </div>
+        <button type="button" class="icon-button" (click)="closeShareModal()" aria-label="Close">×</button>
+      </header>
+
+      <ng-container *ngIf="auth.isLoggedIn(); else shareModalSignIn">
+        <form [formGroup]="shareForm" (ngSubmit)="sharePattern()" novalidate>
+          <label>
+            <span>Title</span>
+            <input formControlName="title" placeholder="e.g., Cozy Moss Stitch Throw" />
+          </label>
+
+          <label>
+            <span>Description</span>
+            <textarea formControlName="description" rows="2" placeholder="Short description"></textarea>
+          </label>
+
+          <label>
+            <span>Image URL (optional)</span>
+            <input formControlName="imageUrl" placeholder="https://..." />
+          </label>
+
+          <label>
+            <span>Rows (one per line)</span>
+            <textarea formControlName="rowsInput" rows="5" placeholder="Row 1: ...&#10;Rows 3-5: repeat step..."></textarea>
+          </label>
+
+          <div class="modal__actions">
+            <button type="button" class="ghost" (click)="closeShareModal()">Cancel</button>
+            <button type="submit" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Saving...' : 'Publish pattern' }}</button>
+          </div>
+          <p *ngIf="error()" class="error">{{ error() }}</p>
+        </form>
+      </ng-container>
+      <ng-template #shareModalSignIn>
+        <article class="share-card share-card--signin">
+          <p class="card-label">Sign in to share</p>
+          <p class="lede">Create an account to publish patterns with images and rows.</p>
+          <a routerLink="/auth" class="cta">Go to sign in</a>
+        </article>
+      </ng-template>
+    </article>
+  </div>
 </div>

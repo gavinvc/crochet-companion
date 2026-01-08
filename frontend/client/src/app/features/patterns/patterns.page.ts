@@ -29,6 +29,7 @@ export class PatternsPage {
   protected readonly isLoading = signal(false);
   protected readonly isSubmitting = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly showShareModal = signal(false);
 
   protected readonly shareForm = this.fb.group({
     title: this.fb.control('', { nonNullable: true, validators: [Validators.required, Validators.minLength(3), Validators.maxLength(160)] }),
@@ -108,6 +109,7 @@ export class PatternsPage {
         this.patterns.update(list => [pattern, ...list]);
         this.shareForm.reset({ title: '', description: '', imageUrl: '', rowsInput: '' });
         this.isSubmitting.set(false);
+        this.closeShareModal();
       },
       error: () => {
         this.error.set('Could not share that pattern. Please try again.');
@@ -177,6 +179,22 @@ export class PatternsPage {
       return;
     }
     this.router.navigate(['/patterns', pattern.id]);
+  }
+
+  protected openShareModal(): void {
+    this.error.set(null);
+    this.showShareModal.set(true);
+  }
+
+  protected closeShareModal(): void {
+    this.showShareModal.set(false);
+  }
+
+  protected scrollToPatterns(): void {
+    const el = document.getElementById('patterns');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   private mergeWithSamples(fetched: PatternSummary[]): PatternSummary[] {

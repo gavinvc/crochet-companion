@@ -26,6 +26,10 @@ export const routes: Routes = [
 				loadComponent: () => import('./features/parser/parser.page').then(m => m.ParserPage)
 			},
 			{
+				path: 'community/:slug',
+				loadComponent: () => import('./features/community/group-detail.page').then(m => m.GroupDetailPage)
+			},
+			{
 				path: 'community',
 				loadComponent: () => import('./features/community/community.page').then(m => m.CommunityPage)
 			},

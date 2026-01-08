@@ -18,7 +18,8 @@ const patternSchema = new mongoose.Schema(
     imageUrl: { type: String, default: '' },
     rows: { type: [rowSchema], default: [] },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    isSample: { type: Boolean, default: false, index: true }
   },
   { timestamps: true }
 );

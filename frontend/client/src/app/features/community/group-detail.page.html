@@ -1,0 +1,115 @@
+<div class="group-detail" *ngIf="group() as grp; else loading">
+  <section class="group-hero" [style.backgroundImage]="grp.coverImageUrl ? 'url(' + grp.coverImageUrl + ')' : ''">
+    <div class="overlay">
+      <p class="eyebrow">Group</p>
+      <h1>{{ grp.name }}</h1>
+      <p class="lede">{{ grp.description || 'No description yet.' }}</p>
+      <div class="tags" *ngIf="grp.tags.length">
+        <span class="tag" *ngFor="let tag of grp.tags">{{ tag }}</span>
+      </div>
+      <div class="stats">
+        <span>{{ grp.memberCount }} members</span>
+        <span>{{ grp.postCount }} posts</span>
+        <span>{{ grp.messageCount }} chat msgs</span>
+      </div>
+      <div class="actions">
+        <button type="button" class="secondary" [routerLink]="'/community'">Back to groups</button>
+        <button type="button" (click)="grp.isMember ? leave() : join()" [class.ghost]="grp.isMember">
+          {{ grp.isMember ? 'Leave group' : 'Join group' }}
+        </button>
+      </div>
+      <p *ngIf="error()" class="error">{{ error() }}</p>
+    </div>
+  </section>
+
+  <section class="group-pane">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Posts</p>
+        <h2>Share updates and link patterns</h2>
+        <p class="muted">Link a pattern id to give context to your post.</p>
+      </div>
+    </header>
+
+    <article class="composer" *ngIf="grp.isMember; else joinPrompt">
+      <form [formGroup]="postForm" (ngSubmit)="createPost()" novalidate>
+        <label>
+          <span>Post content</span>
+          <textarea formControlName="content" rows="3" placeholder="Share progress, questions, or context"></textarea>
+        </label>
+        <label>
+          <span>Linked pattern id (optional)</span>
+          <input formControlName="patternId" placeholder="Paste a pattern id" />
+        </label>
+        <button type="submit" [disabled]="isSavingPost()">{{ isSavingPost() ? 'Posting...' : 'Publish post' }}</button>
+        <p *ngIf="postError()" class="error">{{ postError() }}</p>
+      </form>
+    </article>
+    <ng-template #joinPrompt>
+      <div class="join-card">
+        <p>Join the group to view and create posts.</p>
+        <button type="button" class="secondary" (click)="join()">Join now</button>
+      </div>
+    </ng-template>
+
+    <div class="post-list" *ngIf="posts().length; else emptyPosts">
+      <article class="post" *ngFor="let post of posts()">
+        <div class="post-meta">
+          <div>
+            <p class="author">{{ post.author.displayName }} · @{{ post.author.handle }}</p>
+            <p class="timestamp">{{ post.createdAt | date: 'short' }}</p>
+          </div>
+          <a *ngIf="post.pattern" [routerLink]="['/patterns', post.pattern.id]" class="chip">Linked pattern</a>
+        </div>
+        <p>{{ post.content }}</p>
+      </article>
+    </div>
+    <ng-template #emptyPosts>
+      <p class="empty">No posts yet. Start the conversation.</p>
+    </ng-template>
+  </section>
+
+  <section class="group-pane">
+    <header class="section-header">
+      <div>
+        <p class="eyebrow">Chat</p>
+        <h2>Quick group chat</h2>
+        <p class="muted">Lightweight chat for coordination and questions.</p>
+      </div>
+    </header>
+
+    <article class="composer" *ngIf="grp.isMember; else chatJoin">
+      <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" novalidate>
+        <label>
+          <span>Message</span>
+          <input formControlName="body" placeholder="Say hi or coordinate" />
+        </label>
+        <button type="submit" [disabled]="isSavingMessage()">{{ isSavingMessage() ? 'Sending...' : 'Send' }}</button>
+        <p *ngIf="messageError()" class="error">{{ messageError() }}</p>
+      </form>
+    </article>
+    <ng-template #chatJoin>
+      <div class="join-card">
+        <p>Join the group to view chat.</p>
+        <button type="button" class="secondary" (click)="join()">Join now</button>
+      </div>
+    </ng-template>
+
+    <div class="message-list" *ngIf="messages().length; else emptyMessages">
+      <article class="message" *ngFor="let msg of messages()">
+        <div class="message-meta">
+          <p class="author">{{ msg.author.displayName }} · @{{ msg.author.handle }}</p>
+          <p class="timestamp">{{ msg.createdAt | date: 'short' }}</p>
+        </div>
+        <p>{{ msg.body }}</p>
+      </article>
+    </div>
+    <ng-template #emptyMessages>
+      <p class="empty">No chat messages yet.</p>
+    </ng-template>
+  </section>
+</div>
+
+<ng-template #loading>
+  <p class="loading">Loading group...</p>
+</ng-template>
